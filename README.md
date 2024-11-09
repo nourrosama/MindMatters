@@ -23,5 +23,6 @@ MindMatters is a comprehensive mental health platform designed to provide users 
 
 
 
-##Team members: 
-Nour Osama - Rahma AbdEl-Wahab - Salma Khairy - Nehal Muhammed
+## Team Members
+
+Nour Osama - Rahma Abd El-Wahab - Salma Khairy - Nehal Muhammed
