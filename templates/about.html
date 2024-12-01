@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindMatters</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+        background-color: #f0f2f5;
+    }
+    .navbar {
+        background-color: #ffffff; /* White background */
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd; /* Subtle bottom border */
+    }
+    .navbar .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #000; /* Black text for the logo */
+    }
+    .navbar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 1.5rem; /* Space between menu items */
+    }
+    .navbar ul li a {
+        color: #000; /* Black text for links */
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .navbar ul li a:hover {
+        text-decoration: underline; /* Underline on hover */
+    }
+    .container {
+        margin-top: 100px;
+        max-width: 400px;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">MindMatters</div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="{{ url_for('signup') }}">Sign up</a></li>
+                    <li><a href="{{ url_for('login') }}">Log in</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+        <div class="container my-5">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="image-container">
+                <img src="image1.jpg" alt="Mental Health Scrabble">
+                <img src="image2.jpg" alt="Mental Health Matters">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h2>About MindMatters</h2>
+              <p>
+                MindMatters is dedicated to enhancing mental health awareness. Create an account to explore 
+                our services and connect with others on their journey.
+              </p>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      </body>
+      </html>
