@@ -49,7 +49,7 @@ MindMatters is a Flask-based web application that integrates user authentication
 
 1. **Clone the Repository**:
    ```bash
-   git clone (https://github.com/nourrosama/MindMatters)
+   git clone https://github.com/nourrosama/MindMatters
    cd <repository_folder>
 
 2. **Run the Application**:
