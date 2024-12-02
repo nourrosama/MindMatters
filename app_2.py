@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-
+from datetime import datetime  
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # For session management
 
@@ -9,6 +9,26 @@ users_db = {
     "user2@example.com": {"username": "user2", "password": "password456"}
 }
 
+# Preloaded posts for demonstration
+posts_db = [
+    {
+        "id": 1,
+        "username": "user1",
+        "content": "Hello, world! This is my first post.",
+        "likes": 3,
+        "created_at": datetime.now()
+    },
+    {
+        "id": 2,
+        "username": "user2",
+        "content": "Feeling great today! 😊",
+        "likes": 5,
+        "created_at": datetime.now()
+    }
+]
+
+likes_tracking = {}  # For tracking user likes on posts
+comments_db = {}# For tracking user comments on posts
 # Sample data for doctors
 doctors = [
     {
@@ -87,17 +107,75 @@ def login():
     
     return render_template("login.html")
 
-@app.route("/feed")
+@app.route("/feed", methods=["GET", "POST"])
 def feed():
-    # Check if user is logged in, otherwise redirect to login
     if "user" not in session:
         return redirect(url_for("login"))
 
     user_email = session["user"]
     user = users_db.get(user_email)
     if user:
-        return render_template("feed.html", username=user["username"])
+        if request.method == "POST":
+            post_content = request.form.get("post_content")
+            if post_content.strip():
+                new_post = {
+                    "id": len(posts_db) + 1,
+                    "username": user["username"],
+                    "content": post_content,
+                    "likes": 0,
+                    "created_at": datetime.now()
+                }
+                posts_db.insert(0, new_post)  # Add new posts at the top
+
+        # Pass both posts and comments_db to the template
+        return render_template("feed.html", username=user["username"], posts=posts_db, comments_db=comments_db)
     return redirect(url_for("login"))
+
+
+@app.route("/like_post/<int:post_id>")
+def like_post(post_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    user_email = session["user"]
+    post = next((p for p in posts_db if p["id"] == post_id), None)
+
+    if post:
+        # Initialize the set for this post if it doesn't exist
+        if post_id not in likes_tracking:
+            likes_tracking[post_id] = set()
+
+        # Check if the user has already liked the post
+        if user_email in likes_tracking[post_id]:
+            flash("You can only like a post once.", "warning")
+        else:
+            # Add the user's email to the set and increment the like count
+            likes_tracking[post_id].add(user_email)
+            post["likes"] += 1
+            flash("Post liked!", "success")
+
+    return redirect(url_for("feed"))
+
+@app.route("/comment_post/<int:post_id>", methods=["POST"])
+def comment_post(post_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    comment_content = request.form.get("comment_content")
+    user_email = session["user"]
+    user = users_db.get(user_email)
+    if user and comment_content.strip():
+        comment = {
+            "username": user["username"],
+            "content": comment_content,
+            "created_at": datetime.now()
+        }
+        if post_id not in comments_db:
+            comments_db[post_id] = []
+        comments_db[post_id].append(comment)
+        flash("Comment added!", "success")
+    
+    return redirect(url_for("feed"))
 
 @app.route("/profile")
 def profile():
