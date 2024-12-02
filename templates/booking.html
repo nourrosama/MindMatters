@@ -25,16 +25,26 @@
       border-radius: 50%;
     }
 
+    .calendar-section {
+      font-size: 1.2rem; /* Increase font size for better readability */
+    }
+
     .calendar-section .btn {
       background-color: #e8f0fe;
       border: none;
       color: #007bff;
       font-weight: bold;
+      font-size: 1.5rem; /* Larger navigation buttons */
     }
 
     .calendar-section .btn.active {
       background-color: #007bff;
       color: #ffffff;
+    }
+
+    .calendar-section .row div {
+      padding: 10px 0; /* Add spacing for larger cells */
+      font-size: 1.2rem; /* Larger numbers for the calendar */
     }
 
     .time-slot button {
@@ -74,10 +84,10 @@
           <!-- Calendar Section -->
           <div class="col-md-5 calendar-section">
             <h5>Select a Date & Time</h5>
-            <div class="d-flex justify-content-between align-items-center my-3">
-              <button class="btn btn-sm">&lt;</button>
-              <span>July 2024</span>
-              <button class="btn btn-sm">&gt;</button>
+            <div class="d-flex justify-content-between align-items-center my-4">
+              <button class="btn btn-lg">&lt;</button>
+              <span class="fs-4">July 2024</span>
+              <button class="btn btn-lg">&gt;</button>
             </div>
             <div class="row text-center">
               <div class="col">Sun</div>
@@ -88,7 +98,7 @@
               <div class="col">Fri</div>
               <div class="col">Sat</div>
             </div>
-            <div class="row text-center mt-2">
+            <div class="row text-center mt-3">
               <div class="col">30</div>
               <div class="col">1</div>
               <div class="col">2</div>
@@ -97,7 +107,7 @@
               <div class="col">5</div>
               <div class="col">6</div>
             </div>
-            <div class="row text-center mt-2">
+            <div class="row text-center mt-3">
               <div class="col">7</div>
               <div class="col">8</div>
               <div class="col">9</div>
@@ -106,7 +116,7 @@
               <div class="col">12</div>
               <div class="col">13</div>
             </div>
-            <div class="row text-center mt-2">
+            <div class="row text-center mt-3">
               <div class="col">14</div>
               <div class="col">15</div>
               <div class="col">16</div>
