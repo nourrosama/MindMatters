@@ -1,7 +1,37 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from datetime import datetime  
+from datetime import datetime 
+import secrets
+from authlib.integrations.flask_client import OAuth
+
+# Generate a random 32-byte string and encode it in hexadecimal
+secure_key = secrets.token_hex(32)
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # For session management
+app.secret_key =  secure_key # For session management
+
+# Initialize OAuth
+oauth = OAuth(app)
+
+# Google OAuth configuration
+google = oauth.register(
+    name='google',
+    client_id='your_google_client_id',
+    client_secret='your_google_client_secret',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    api_base_url='https://www.googleapis.com/oauth2/v1/',
+    client_kwargs={'scope': 'openid email profile'}
+)
+
+# Facebook OAuth configuration
+facebook = oauth.register(
+    name='facebook',
+    client_id='your_facebook_app_id',
+    client_secret='your_facebook_app_secret',
+    access_token_url='https://graph.facebook.com/oauth/access_token',
+    authorize_url='https://www.facebook.com/dialog/oauth',
+    api_base_url='https://graph.facebook.com/',
+    client_kwargs={'scope': 'email'}
+)
 
 # In-memory database for users (use a real database in production)
 users_db = {
@@ -107,29 +137,73 @@ def login():
     
     return render_template("login.html")
 
+@app.route("/login/google")
+def login_google():
+    return google.authorize_redirect(url_for("authorize_google", _external=True))
+
+@app.route("/authorize/google")
+def authorize_google():
+    token = google.authorize_access_token()
+    user_info = google.get('userinfo').json()
+    
+    # Store user information in the session
+    session['user'] = {
+        'provider': 'Google',
+        'name': user_info.get('name'),
+        'email': user_info.get('email'),
+        'picture': user_info.get('picture')
+    }
+
+    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+
+@app.route("/login/facebook")
+def login_facebook():
+    return facebook.authorize_redirect(url_for("authorize_facebook", _external=True))
+
+@app.route("/authorize/facebook")
+def authorize_facebook():
+    token = facebook.authorize_access_token()
+    user_info = facebook.get('me?fields=id,name,email,picture').json()
+
+    # Store user information in the session
+    session['user'] = {
+        'provider': 'Facebook',
+        'name': user_info.get('name'),
+        'email': user_info.get('email'),
+        'picture': user_info['picture']['data']['url']
+    }
+
+    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+
 @app.route("/feed", methods=["GET", "POST"])
 def feed():
-    if "user" not in session:
-        return redirect(url_for("login"))
+    user_email = session.get("user")  # Get the user from the session
+    if not user_email:
+        return redirect(url_for("login"))  # Redirect to login if not logged in
 
-    user_email = session["user"]
-    user = users_db.get(user_email)
+    user = users_db.get(user_email)  # Assuming `users_db` contains user data
     if user:
         if request.method == "POST":
             post_content = request.form.get("post_content")
-            if post_content.strip():
+            if post_content and post_content.strip():
                 new_post = {
                     "id": len(posts_db) + 1,
                     "username": user["username"],
-                    "content": post_content,
+                    "content": post_content.strip(),
                     "likes": 0,
                     "created_at": datetime.now()
                 }
                 posts_db.insert(0, new_post)  # Add new posts at the top
 
-        # Pass both posts and comments_db to the template
-        return render_template("feed.html", username=user["username"], posts=posts_db, comments_db=comments_db)
+        return render_template(
+            "feed.html", 
+            username=user["username"], 
+            posts=posts_db, 
+            comments_db=comments_db
+        )
+
     return redirect(url_for("login"))
+
 
 
 @app.route("/like_post/<int:post_id>")

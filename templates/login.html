@@ -28,7 +28,9 @@
     <!-- Login Form -->
     <div class="container bg-white rounded shadow p-4">
         <h1 class="text-center mb-4">Log In</h1>
-        <form action="#" method="POST">
+
+        <!-- Regular Login Form -->
+        <form action="{{ url_for('login') }}" method="POST">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
@@ -41,14 +43,15 @@
             <button type="submit" class="btn btn-primary w-100">Log In</button>
         </form>
 
-        <div class="text-center mt-3">
+        <!-- OAuth Buttons -->
+        <div class="text-center mt-4">
             <p>Or log in with:</p>
-            <button class="btn btn-outline-primary w-100 mb-2">
+            <a href="{{ url_for('login_google') }}" class="btn btn-outline-primary w-100 mb-2">
+                <i class="fab fa-google"></i> Google
+            </a>
+            <a href="{{ url_for('login_facebook') }}" class="btn btn-outline-primary w-100">
                 <i class="fab fa-facebook-f"></i> Facebook
-            </button>
-            <button class="btn btn-outline-secondary w-100">
-                <i class="fas fa-envelope"></i> Gmail
-            </button>
+            </a>
         </div>
 
         <p class="text-center mt-3">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
