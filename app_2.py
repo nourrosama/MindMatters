@@ -3,15 +3,12 @@ from datetime import datetime
 import secrets
 from authlib.integrations.flask_client import OAuth
 
-# Generate a random 32-byte string and encode it in hexadecimal
-secure_key = secrets.token_hex(32)
+secure_key = "my_secret"
 app = Flask(__name__)
-app.secret_key =  secure_key # For session management
+app.secret_key =  secure_key 
 
-# Initialize OAuth
 oauth = OAuth(app)
 
-# Google OAuth configuration
 google = oauth.register(
     name='google',
     client_id='your_google_client_id',
@@ -22,7 +19,7 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# Facebook OAuth configuration
+
 facebook = oauth.register(
     name='facebook',
     client_id='your_facebook_app_id',
@@ -33,13 +30,11 @@ facebook = oauth.register(
     client_kwargs={'scope': 'email'}
 )
 
-# In-memory database for users (use a real database in production)
 users_db = {
     "user1@example.com": {"username": "user1", "password": "password123"},
     "user2@example.com": {"username": "user2", "password": "password456"}
 }
 
-# Preloaded posts for demonstration
 posts_db = [
     {
         "id": 1,
@@ -57,9 +52,8 @@ posts_db = [
     }
 ]
 
-likes_tracking = {}  # For tracking user likes on posts
-comments_db = {}# For tracking user comments on posts
-# Sample data for doctors
+likes_tracking = {}
+comments_db = {}
 doctors = [
     {
         "id": 1,
@@ -89,7 +83,6 @@ doctors = [
 
 @app.route("/")
 def home():
-    # Render the main page; redirect to feed if the user is already logged in
     if "user" in session:
         return redirect(url_for("feed"))
     return render_template("mainpage.html")
@@ -106,13 +99,11 @@ def signup():
             flash("Passwords do not match!", "danger")
             return render_template("signup.html")
 
-        # Save user to users_db (in a real application, save to database)
         if email in users_db:
             flash("Email is already registered!", "danger")
             return render_template("signup.html")
         users_db[email] = {"username": username, "password": password}
         
-        # Store user session after signup
         session["user"] = email
         flash("Signup successful! Welcome!", "success")
         return redirect(url_for("feed"))
@@ -125,10 +116,9 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        # Validate login credentials
         user = users_db.get(email)
         if user and user["password"] == password:
-            session["user"] = email  # Store session
+            session["user"] = email  
             flash("Login successful!", "success")
             return redirect(url_for("feed"))
         else:
@@ -146,7 +136,6 @@ def authorize_google():
     token = google.authorize_access_token()
     user_info = google.get('userinfo').json()
     
-    # Store user information in the session
     session['user'] = {
         'provider': 'Google',
         'name': user_info.get('name'),
@@ -154,7 +143,7 @@ def authorize_google():
         'picture': user_info.get('picture')
     }
 
-    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+    return redirect(url_for("feed")) 
 
 @app.route("/login/facebook")
 def login_facebook():
@@ -165,7 +154,6 @@ def authorize_facebook():
     token = facebook.authorize_access_token()
     user_info = facebook.get('me?fields=id,name,email,picture').json()
 
-    # Store user information in the session
     session['user'] = {
         'provider': 'Facebook',
         'name': user_info.get('name'),
@@ -173,15 +161,15 @@ def authorize_facebook():
         'picture': user_info['picture']['data']['url']
     }
 
-    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+    return redirect(url_for("feed"))  
 
 @app.route("/feed", methods=["GET", "POST"])
 def feed():
-    user_email = session.get("user")  # Get the user from the session
+    user_email = session.get("user")  
     if not user_email:
-        return redirect(url_for("login"))  # Redirect to login if not logged in
+        return redirect(url_for("login"))  
 
-    user = users_db.get(user_email)  # Assuming users_db contains user data
+    user = users_db.get(user_email)  
     if user:
         if request.method == "POST":
             post_content = request.form.get("post_content")
@@ -193,7 +181,7 @@ def feed():
                     "likes": 0,
                     "created_at": datetime.now()
                 }
-                posts_db.insert(0, new_post)  # Add new posts at the top
+                posts_db.insert(0, new_post)  
 
         return render_template(
             "feed.html", 
@@ -223,15 +211,12 @@ def like_post(post_id):
     post = next((p for p in posts_db if p["id"] == post_id), None)
 
     if post:
-        # Initialize the set for this post if it doesn't exist
         if post_id not in likes_tracking:
             likes_tracking[post_id] = set()
 
-        # Check if the user has already liked the post
         if user_email in likes_tracking[post_id]:
             flash("You can only like a post once.", "warning")
         else:
-            # Add the user's email to the set and increment the like count
             likes_tracking[post_id].add(user_email)
             post["likes"] += 1
             flash("Post liked!", "success")
@@ -274,7 +259,6 @@ def consultation():
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    # Show a list of doctors with links to their booking pages
     return render_template("consultation.html", doctors=doctors)
 
 @app.route("/booking/<int:doctor_id>")
@@ -282,7 +266,6 @@ def booking(doctor_id):
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    # Fetch the selected doctor's details
     doctor = next((doc for doc in doctors if doc["id"] == doctor_id), None)
     if not doctor:
         flash("Doctor not found.", "danger")
@@ -292,7 +275,7 @@ def booking(doctor_id):
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)  # Remove the user from session
+    session.pop("user", None)
     flash("You have been logged out.", "info")
     return redirect(url_for("mainpage"))
 
