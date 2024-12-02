@@ -68,79 +68,52 @@
   </style>
 </head>
 <body>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8 booking-container">
-        <h3 class="text-center mb-4">Share your booking page</h3>
-        <div class="row">
-          <!-- Profile Section -->
-          <div class="col-md-3 text-center profile-section">
-            <img src="https://via.placeholder.com/60" alt="Profile Image">
-            <h5 class="mt-2">Fatima Sy</h5>
-            <p class="text-muted">Client Check-in</p>
-            <p class="text-muted">30 min</p>
-            <p class="text-muted">Zoom</p>
-          </div>
-          <!-- Calendar Section -->
-          <div class="col-md-5 calendar-section">
-            <h5>Select a Date & Time</h5>
-            <div class="d-flex justify-content-between align-items-center my-4">
-              <button class="btn btn-lg">&lt;</button>
-              <span class="fs-4">July 2024</span>
-              <button class="btn btn-lg">&gt;</button>
-            </div>
-            <div class="row text-center">
-              <div class="col">Sun</div>
-              <div class="col">Mon</div>
-              <div class="col">Tue</div>
-              <div class="col">Wed</div>
-              <div class="col">Thu</div>
-              <div class="col">Fri</div>
-              <div class="col">Sat</div>
-            </div>
-            <div class="row text-center mt-3">
-              <div class="col">30</div>
-              <div class="col">1</div>
-              <div class="col">2</div>
-              <div class="col">3</div>
-              <div class="col">4</div>
-              <div class="col">5</div>
-              <div class="col">6</div>
-            </div>
-            <div class="row text-center mt-3">
-              <div class="col">7</div>
-              <div class="col">8</div>
-              <div class="col">9</div>
-              <div class="col">10</div>
-              <div class="col">11</div>
-              <div class="col">12</div>
-              <div class="col">13</div>
-            </div>
-            <div class="row text-center mt-3">
-              <div class="col">14</div>
-              <div class="col">15</div>
-              <div class="col">16</div>
-              <div class="col btn active">22</div>
-              <div class="col">23</div>
-              <div class="col">24</div>
-              <div class="col">25</div>
-            </div>
-          </div>
-          <!-- Time Slot Section -->
-          <div class="col-md-4 time-slot">
-            <h5>Monday, July 22</h5>
-            <button class="mt-2">10:00am</button>
-            <button class="mt-2 active">11:00am</button>
-            <button class="mt-2">1:00pm</button>
-            <button class="mt-2">2:30pm</button>
-            <button class="mt-2">4:00pm</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 booking-container">
+                <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
+                <div class="row">
+                    <div class="col-md-3 text-center profile-section">
+                        <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
+                        <h5 class="mt-2">{{ doctor['name'] }}</h5>
+                        <p class="text-muted">{{ doctor['specialty'] }}</p>
+                    </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <div class="col-md-5 calendar-section">
+                        <h5>Select a Date & Time</h5>
+                        <div class="d-flex justify-content-between align-items-center my-4">
+                            <button class="btn btn-lg">&lt;</button>
+                            <span class="fs-4">July 2024</span>
+                            <button class="btn btn-lg">&gt;</button>
+                        </div>
+                        <div class="row">
+                            <!-- Add calendar here -->
+                            <div class="col text-center">
+                                <button class="btn btn-outline-primary">14</button>
+                                <button class="btn btn-outline-primary">15</button>
+                                <button class="btn btn-outline-primary">16</button>
+                                <button class="btn btn-outline-primary">17</button>
+                                <button class="btn btn-outline-primary">18</button>
+                                <button class="btn btn-outline-primary">19</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 time-section">
+                        <h5>Available Time Slots</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">9:00 AM - 10:00 AM</li>
+                            <li class="list-group-item">10:00 AM - 11:00 AM</li>
+                            <li class="list-group-item">11:00 AM - 12:00 PM</li>
+                            <li class="list-group-item">1:00 PM - 2:00 PM</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary mt-4">Confirm Appointment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
