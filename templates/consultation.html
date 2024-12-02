@@ -10,6 +10,34 @@
         body {
             background-color: #f8f9fa;
         }
+        .navbar {
+            background-color: #ffffff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+        }
+        .navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+        }
+        .navbar ul li a {
+            color: #000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .navbar ul li a:hover {
+            text-decoration: underline;
+        }
         .section-title {
             margin-bottom: 20px;
             color: #495057;
@@ -31,9 +59,30 @@
         .card:hover img {
             transform: scale(1.1);
         }
+        .search-bar {
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 1rem;
+            width: 200px;
+        }
     </style>
 </head>
 <body>
+    <header>
+        <div class="navbar">
+            <div class="logo">MindMatters</div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('feed') }}">Home</a></li>
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
+                    <li><input type="text" class="search-bar" placeholder="Search professionals..."></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <div class="container my-5">
         <h2 class="section-title">Professional Consultation Booking</h2>
         <div class="card p-4">
@@ -45,50 +94,27 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
-            <div class="mt-4">
-                <p><strong>Results:</strong> Matching professionals will appear here.</p>
-            </div>
         </div>
-
         <!-- Section for Doctors -->
         <div class="mt-5">
             <h3 class="section-title">Meet Our Experts</h3>
             <div class="row">
-                <!-- Doctor 1 -->
+                {% for doctor in doctors %}
                 <div class="col-md-4 mb-4">
                     <div class="card doctor-card p-3 text-center">
-                        <img src="https://via.placeholder.com/100" alt="Dr. Jane Doe">
+                        <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
                         <div class="card-body">
-                            <h5 class="card-title">Dr. Jane Doe</h5>
-                            <p class="card-text">A licensed clinical psychologist with 10+ years of experience in cognitive behavioral therapy and anxiety management.</p>
+                            <h5 class="card-title">{{ doctor['name'] }}</h5>
+                            <p class="card-text">{{ doctor['description'] }}</p>
+                            <a href="{{ url_for('booking', doctor_id=doctor['id']) }}" class="btn btn-primary mt-3">Book Appointment</a>
                         </div>
                     </div>
                 </div>
-                <!-- Doctor 2 -->
-                <div class="col-md-4 mb-4">
-                    <div class="card doctor-card p-3 text-center">
-                        <img src="https://via.placeholder.com/100" alt="Dr. John Smith">
-                        <div class="card-body">
-                            <h5 class="card-title">Dr. John Smith</h5>
-                            <p class="card-text">A psychiatrist specializing in mood disorders and depression treatment, with a focus on holistic care.</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Doctor 3 -->
-                <div class="col-md-4 mb-4">
-                    <div class="card doctor-card p-3 text-center">
-                        <img src="https://via.placeholder.com/100" alt="Dr. Sarah Lee">
-                        <div class="card-body">
-                            <h5 class="card-title">Dr. Sarah Lee</h5>
-                            <p class="card-text">An experienced therapist specializing in family counseling and child development, helping families achieve harmony.</p>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
