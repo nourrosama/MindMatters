@@ -17,10 +17,19 @@
         .card {
             border: none;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         .doctor-card img {
             max-width: 100px;
             border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        .card:hover img {
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -47,11 +56,9 @@
             <div class="row">
                 <!-- Doctor 1 -->
                 <div class="col-md-4 mb-4">
-                    <div class="card doctor-card p-3">
-                        <div class="text-center">
-                            <img src="https://via.placeholder.com/100" alt="Dr. Jane Doe">
-                        </div>
-                        <div class="card-body text-center">
+                    <div class="card doctor-card p-3 text-center">
+                        <img src="https://via.placeholder.com/100" alt="Dr. Jane Doe">
+                        <div class="card-body">
                             <h5 class="card-title">Dr. Jane Doe</h5>
                             <p class="card-text">A licensed clinical psychologist with 10+ years of experience in cognitive behavioral therapy and anxiety management.</p>
                         </div>
@@ -59,11 +66,9 @@
                 </div>
                 <!-- Doctor 2 -->
                 <div class="col-md-4 mb-4">
-                    <div class="card doctor-card p-3">
-                        <div class="text-center">
-                            <img src="https://via.placeholder.com/100" alt="Dr. John Smith">
-                        </div>
-                        <div class="card-body text-center">
+                    <div class="card doctor-card p-3 text-center">
+                        <img src="https://via.placeholder.com/100" alt="Dr. John Smith">
+                        <div class="card-body">
                             <h5 class="card-title">Dr. John Smith</h5>
                             <p class="card-text">A psychiatrist specializing in mood disorders and depression treatment, with a focus on holistic care.</p>
                         </div>
@@ -71,11 +76,9 @@
                 </div>
                 <!-- Doctor 3 -->
                 <div class="col-md-4 mb-4">
-                    <div class="card doctor-card p-3">
-                        <div class="text-center">
-                            <img src="https://via.placeholder.com/100" alt="Dr. Sarah Lee">
-                        </div>
-                        <div class="card-body text-center">
+                    <div class="card doctor-card p-3 text-center">
+                        <img src="https://via.placeholder.com/100" alt="Dr. Sarah Lee">
+                        <div class="card-body">
                             <h5 class="card-title">Dr. Sarah Lee</h5>
                             <p class="card-text">An experienced therapist specializing in family counseling and child development, helping families achieve harmony.</p>
                         </div>
