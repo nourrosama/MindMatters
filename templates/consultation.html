@@ -18,6 +18,10 @@
             border: none;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        .doctor-card img {
+            max-width: 100px;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -34,6 +38,49 @@
             </form>
             <div class="mt-4">
                 <p><strong>Results:</strong> Matching professionals will appear here.</p>
+            </div>
+        </div>
+
+        <!-- Section for Doctors -->
+        <div class="mt-5">
+            <h3 class="section-title">Meet Our Experts</h3>
+            <div class="row">
+                <!-- Doctor 1 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card doctor-card p-3">
+                        <div class="text-center">
+                            <img src="https://via.placeholder.com/100" alt="Dr. Jane Doe">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Dr. Jane Doe</h5>
+                            <p class="card-text">A licensed clinical psychologist with 10+ years of experience in cognitive behavioral therapy and anxiety management.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Doctor 2 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card doctor-card p-3">
+                        <div class="text-center">
+                            <img src="https://via.placeholder.com/100" alt="Dr. John Smith">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Dr. John Smith</h5>
+                            <p class="card-text">A psychiatrist specializing in mood disorders and depression treatment, with a focus on holistic care.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Doctor 3 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card doctor-card p-3">
+                        <div class="text-center">
+                            <img src="https://via.placeholder.com/100" alt="Dr. Sarah Lee">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Dr. Sarah Lee</h5>
+                            <p class="card-text">An experienced therapist specializing in family counseling and child development, helping families achieve harmony.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
