@@ -11,9 +11,9 @@ MindMatters is a comprehensive mental health platform designed to provide users 
 
 ## Technology Stack
 
-- **Frontend**: React
-- **Backend**: Django
-- **Database**: MongoDB
+- **Frontend**: HTML, CSS
+- **Backend**: Flask
+- **Database**: MongoDB, sqlite3
 - **Testing**: Jest, Postman
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker
