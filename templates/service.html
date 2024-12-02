@@ -10,6 +10,34 @@
     body {
       background-color: #d4efdf; /* Light green background for a soothing feel */
     }
+    .navbar {
+      background-color: #ffffff; /* White background */
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd; /* Subtle bottom border */
+    }
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #000; /* Black text for the logo */
+    }
+    .navbar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 1.5rem; /* Space between menu items */
+    }
+    .navbar ul li a {
+      color: #000; /* Black text for links */
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .navbar ul li a:hover {
+      text-decoration: underline; /* Underline on hover */
+    }
     .service-section {
       text-align: center;
       padding: 50px 20px;
@@ -41,6 +69,22 @@
   </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <header>
+    <div class="navbar">
+      <div class="logo">Mind Matters</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('services') }}">Services</a></li>
+          <li><a href="{{ url_for('signup') }}">Sign up</a></li>
+          <li><a href="{{ url_for('login') }}">Log in</a></li>
+      </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
   <div class="container text-center mt-5">
     <h1 class="fw-bold">Mind Matters Services</h1>
     <p>Explore our services designed to enhance your mental well-being and personal growth. Sign up today!</p>

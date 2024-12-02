@@ -75,10 +75,13 @@
             <nav>
                 <ul>
                     <li><a href="{{ url_for('feed') }}">Home</a></li>
+                    <li><a href="{{ url_for('resources') }}">Resources</a></li>
                     <li><a href="{{ url_for('profile') }}">Profile</a></li>
                     <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
-                    <li><input type="text" class="search-bar" placeholder="Search professionals..."></li>
-                </ul>
+                    <li>
+                      <input type="text" class="search-bar" placeholder="Search...">
+                    </li>
+                  </ul>
             </nav>
         </div>
     </header>

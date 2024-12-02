@@ -6,23 +6,74 @@
   <title>Mind Matters Platform</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+        background-color: #f0f2f5;
+    }
+    .navbar {
+        background-color: #ffffff; /* White background */
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd; /* Subtle bottom border */
+    }
+    .navbar .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #000; /* Black text for the logo */
+    }
+    .navbar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 1.5rem; /* Space between menu items */
+    }
+    .navbar ul li a {
+        color: #000; /* Black text for links */
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .navbar ul li a:hover {
+        text-decoration: underline; /* Underline on hover */
+    }
+    .container {
+        margin-top: 100px;
+        max-width: 400px;
+    }
+    .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    .search-bar {
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      width: 200px;
+    }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Mind Matters</a>
-      <ul class="nav">
-        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Explore</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Our Professionals</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Notifications</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Log out</a></li>
-      </ul>
+  <header>
+    <div class="navbar">
+      <div class="logo">Mind Matters</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('feed') }}">Home</a></li>
+          <li><a href="{{ url_for('resources') }}">Resources</a></li>
+          <li><a href="{{ url_for('profile') }}">Profile</a></li>
+          <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
+          <li>
+            <input type="text" class="search-bar" placeholder="Search...">
+          </li>
+        </ul>
+      </nav>
     </div>
-  </nav>
+  </header>
 
   <!-- Profile Section -->
   <div class="container mt-4">
@@ -33,7 +84,6 @@
         <p>130 Followers</p>
         <p>Welcome to my profile!</p>
         <button class="btn btn-primary">Message</button>
-        <button class="btn btn-outline-dark">Profile</button>
       </div>
     </div>
 
