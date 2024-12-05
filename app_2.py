@@ -80,13 +80,11 @@ doctors = [
         "image": "https://via.placeholder.com/100"
     }
 ]
-
 @app.route("/")
 def home():
     if "user" in session:
         return redirect(url_for("feed"))
     return render_template("mainpage.html")
-
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -96,16 +94,16 @@ def signup():
         confirm_password = request.form.get("confirm-password")
 
         if password != confirm_password:
-            flash("Passwords do not match!", "danger")
+            #flash("Passwords do not match!", "danger")
             return render_template("signup.html")
 
         if email in users_db:
-            flash("Email is already registered!", "danger")
+            #flash("Email is already registered!", "danger")
             return render_template("signup.html")
         users_db[email] = {"username": username, "password": password}
         
         session["user"] = email
-        flash("Signup successful! Welcome!", "success")
+        #flash("Signup successful! Welcome!", "success")
         return redirect(url_for("feed"))
 
     return render_template("signup.html")
@@ -119,10 +117,10 @@ def login():
         user = users_db.get(email)
         if user and user["password"] == password:
             session["user"] = email  
-            flash("Login successful!", "success")
+            #flash("Login successful!", "success")
             return redirect(url_for("feed"))
         else:
-            flash("Invalid email or password.", "danger")
+            #flash("Invalid email or password.", "danger")
             return render_template("login.html")
     
     return render_template("login.html")
@@ -200,8 +198,6 @@ def services():
 def resources():
     return render_template("resources.html")
 
-
-
 @app.route("/like_post/<int:post_id>")
 def like_post(post_id):
     if "user" not in session:
@@ -215,11 +211,11 @@ def like_post(post_id):
             likes_tracking[post_id] = set()
 
         if user_email in likes_tracking[post_id]:
-            flash("You can only like a post once.", "warning")
-        else:
+            #flash("You can only like a post once.", "warning")
+        #else:
             likes_tracking[post_id].add(user_email)
             post["likes"] += 1
-            flash("Post liked!", "success")
+            #flash("Post liked!", "success")
 
     return redirect(url_for("feed"))
 
@@ -239,7 +235,7 @@ def comment_post(post_id):
         if post_id not in comments_db:
             comments_db[post_id] = []
         comments_db[post_id].append(comment)
-        flash("Comment added!", "success")
+        #flash("Comment added!", "success")
     
     return redirect(url_for("feed"))
 
@@ -268,7 +264,7 @@ def booking(doctor_id):
 
     doctor = next((doc for doc in doctors if doc["id"] == doctor_id), None)
     if not doctor:
-        flash("Doctor not found.", "danger")
+        #flash("Doctor not found.", "danger")
         return redirect(url_for("consultation"))
     
     return render_template("booking.html", doctor=doctor)
@@ -276,11 +272,11 @@ def booking(doctor_id):
 @app.route("/logout")
 def logout():
     session.pop("user", None)
-    flash("You have been logged out.", "info")
+    #flash("You have been logged out.", "info")
     return redirect(url_for("mainpage"))
 
-@app.errorhandler(404)
-def page_not_found(e):
+@app.route("/trigger-404")
+def trigger_404():
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
