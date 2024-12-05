@@ -3,12 +3,16 @@ from datetime import datetime
 import secrets
 from authlib.integrations.flask_client import OAuth
 
-secure_key = "my_secret"
-app = Flask(__name__)
-app.secret_key =  secure_key 
 
+# Generate a random 32-byte string and encode it in hexadecimal
+secure_key = secrets.token_hex(32)
+app = Flask(__name__)
+app.secret_key =  secure_key # For session management
+
+# Initialize OAuth
 oauth = OAuth(app)
 
+# Google OAuth configuration
 google = oauth.register(
     name='google',
     client_id='your_google_client_id',
@@ -19,7 +23,7 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-
+# Facebook OAuth configuration
 facebook = oauth.register(
     name='facebook',
     client_id='your_facebook_app_id',
@@ -143,6 +147,7 @@ def authorize_google():
         'picture': user_info.get('picture')
     }
 
+
     return redirect(url_for("feed")) 
 
 @app.route("/login/facebook")
@@ -154,12 +159,7 @@ def authorize_facebook():
     token = facebook.authorize_access_token()
     user_info = facebook.get('me?fields=id,name,email,picture').json()
 
-    session['user'] = {
-        'provider': 'Facebook',
-        'name': user_info.get('name'),
-        'email': user_info.get('email'),
-        'picture': user_info['picture']['data']['url']
-    }
+
 
     return redirect(url_for("feed"))  
 
@@ -170,6 +170,7 @@ def feed():
         return redirect(url_for("login"))  
 
     user = users_db.get(user_email)  
+
     if user:
         if request.method == "POST":
             post_content = request.form.get("post_content")
@@ -189,7 +190,6 @@ def feed():
             posts=posts_db, 
             comments_db=comments_db
         )
-
     return redirect(url_for("login"))
 
 @app.route("/services")
@@ -199,6 +199,7 @@ def services():
 @app.route("/resources")
 def resources():
     return render_template("resources.html")
+
 
 
 

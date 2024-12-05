@@ -3,32 +3,33 @@ body {
     background-color: #f0f2f5;
 }
 .navbar {
-    background-color: #ffffff; 
+    background-color: #ffffff; /* White background */
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd; 
+    border-bottom: 1px solid #ddd; /* Subtle bottom border */
 }
 .navbar .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #000; 
+    color: #000; /* Black text for the logo */
 }
 .navbar ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    gap: 1.5rem; 
+
+    gap: 1.5rem; /* Space between menu items */
 }
 .navbar ul li a {
-    color: #000; 
+    color: #000; /* Black text for links */
     text-decoration: none;
     font-weight: 500;
 }
 .navbar ul li a:hover {
-    text-decoration: underline; 
+    text-decoration: underline; /* Underline on hover */
 }
 .container {
     margin-top: 100px;
