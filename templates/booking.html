@@ -20,31 +20,45 @@
     }
 
     .profile-section img {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
     }
 
     .calendar-section {
-      font-size: 1.2rem; /* Increase font size for better readability */
+      font-size: 1rem;
     }
 
-    .calendar-section .btn {
-      background-color: #e8f0fe;
-      border: none;
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      text-align: center;
+    }
+
+    .calendar-grid button {
+      width: 100%;
+      padding: 15px 0; 
+      border: 1px solid #007bff;
       color: #007bff;
+      background-color: #ffffff;
+      border-radius: 5px;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.5rem; /* Larger navigation buttons */
     }
 
-    .calendar-section .btn.active {
+    .calendar-grid button:hover,
+    .calendar-grid button.active {
       background-color: #007bff;
       color: #ffffff;
     }
 
-    .calendar-section .row div {
-      padding: 10px 0; /* Add spacing for larger cells */
-      font-size: 1.2rem; /* Larger numbers for the calendar */
+    .time-section {
+      margin-top: 20px;
+    }
+
+    .time-slot {
+      margin-top: 10px;
     }
 
     .time-slot button {
@@ -54,13 +68,10 @@
       color: #007bff;
       background-color: #ffffff;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
 
-    .time-slot button:hover {
-      background-color: #007bff;
-      color: #ffffff;
-    }
-
+    .time-slot button:hover,
     .time-slot button.active {
       background-color: #007bff;
       color: #ffffff;
@@ -68,52 +79,80 @@
   </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 booking-container">
-                <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
-                <div class="row">
-                    <div class="col-md-3 text-center profile-section">
-                        <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
-                        <h5 class="mt-2">{{ doctor['name'] }}</h5>
-                        <p class="text-muted">{{ doctor['specialty'] }}</p>
-                    </div>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 booking-container">
+        <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
+        <div class="row">
+          <div class="col-md-3 text-center profile-section">
+            <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
+            <h5 class="mt-2">{{ doctor['name'] }}</h5>
+            <p class="text-muted">{{ doctor['specialty'] }}</p>
+          </div>
+          <!-- Time Slots  -->
+          <div class="col-md-3 time-section">
+            <h5>Available Time Slots</h5>
+            <ul class="list-group">
+              <li class="list-group-item">9:00 AM - 10:00 AM</li>
+              <li class="list-group-item">10:00 AM - 11:00 AM</li>
+              <li class="list-group-item">11:00 AM - 12:00 PM</li>
+              <li class="list-group-item">1:00 PM - 2:00 PM</li>
+            </ul>
+            <a href="{{ url_for('trigger_404') }}" class="btn btn-primary mt-4 w-100">Confirm Appointment</a>
+          </div>
 
-                    <div class="col-md-5 calendar-section">
-                        <h5>Select a Date & Time</h5>
-                        <div class="d-flex justify-content-between align-items-center my-4">
-                            <button class="btn btn-lg">&lt;</button>
-                            <span class="fs-4">July 2024</span>
-                            <button class="btn btn-lg">&gt;</button>
-                        </div>
-                        <div class="row">
-                            <!-- Add calendar here -->
-                            <div class="col text-center">
-                                <button class="btn btn-outline-primary">14</button>
-                                <button class="btn btn-outline-primary">15</button>
-                                <button class="btn btn-outline-primary">16</button>
-                                <button class="btn btn-outline-primary">17</button>
-                                <button class="btn btn-outline-primary">18</button>
-                                <button class="btn btn-outline-primary">19</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 time-section">
-                        <h5>Available Time Slots</h5>
-                        <ul class="list-group">
-                            <li class="list-group-item">9:00 AM - 10:00 AM</li>
-                            <li class="list-group-item">10:00 AM - 11:00 AM</li>
-                            <li class="list-group-item">11:00 AM - 12:00 PM</li>
-                            <li class="list-group-item">1:00 PM - 2:00 PM</li>
-                        </ul>
-                        <a href="#" class="btn btn-primary mt-4">Confirm Appointment</a>
-                    </div>
-                </div>
+          <!-- Calendar  -->
+          <div class="col-md-9 calendar-section">
+            <h5 class="text-center">Select a Date</h5>
+            <p class="text-center fs-4">July 2024</p>
+            <div class="calendar-grid">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+              <!-- Empty cells for days before the month starts -->
+              <div></div><div></div><div></div><div></div><div></div>
+              <button>1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>4</button>
+              <button>5</button>
+              <button>6</button>
+              <button>7</button>
+              <button>8</button>
+              <button>9</button>
+              <button>10</button>
+              <button>11</button>
+              <button>12</button>
+              <button>13</button>
+              <button>14</button>
+              <button>15</button>
+              <button>16</button>
+              <button>17</button>
+              <button>18</button>
+              <button>19</button>
+              <button>20</button>
+              <button>21</button>
+              <button>22</button>
+              <button>23</button>
+              <button>24</button>
+              <button>25</button>
+              <button>26</button>
+              <button>27</button>
+              <button>28</button>
+              <button>29</button>
+              <button>30</button>
+              <button>31</button>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -75,10 +75,13 @@
             <nav>
                 <ul>
                     <li><a href="{{ url_for('feed') }}">Home</a></li>
+                    <li><a href="{{ url_for('resources') }}">Resources</a></li>
                     <li><a href="{{ url_for('profile') }}">Profile</a></li>
                     <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
-                    <li><input type="text" class="search-bar" placeholder="Search professionals..."></li>
-                </ul>
+                    <li>
+                      <input type="text" class="search-bar" placeholder="Search...">
+                    </li>
+                  </ul>
             </nav>
         </div>
     </header>
@@ -95,7 +98,7 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
         </div>
-        <!-- Section for Doctors -->
+        <!-- Doctors sections -->
         <div class="mt-5">
             <h3 class="section-title">Meet Our Experts</h3>
             <div class="row">

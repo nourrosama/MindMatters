@@ -10,32 +10,32 @@
       background-color: #f0f2f5;
     }
     .navbar {
-      background-color: #ffffff; /* White background */
+      background-color: #ffffff; 
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #ddd; /* Subtle bottom border */
+      border-bottom: 1px solid #ddd; 
     }
     .navbar .logo {
       font-size: 1.5rem;
       font-weight: bold;
-      color: #000; /* Black text for the logo */
+      color: #000; 
     }
     .navbar ul {
       list-style: none;
       margin: 0;
       padding: 0;
       display: flex;
-      gap: 1.5rem; /* Space between menu items */
+      gap: 1.5rem; 
     }
     .navbar ul li a {
-      color: #000; /* Black text for links */
+      color: #000; 
       text-decoration: none;
       font-weight: 500;
     }
     .navbar ul li a:hover {
-      text-decoration: underline; /* Underline on hover */
+      text-decoration: underline; 
     }
     .search-bar {
       border: 1px solid #ddd;
@@ -53,6 +53,7 @@
       <nav>
         <ul>
           <li><a href="{{ url_for('feed') }}">Home</a></li>
+          <li><a href="{{ url_for('resources') }}">Resources</a></li>
           <li><a href="{{ url_for('profile') }}">Profile</a></li>
           <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
           <li>
@@ -67,13 +68,13 @@
     <h3 class="text-center">Latest Posts</h3>
     <p class="text-center">Welcome back, {{ username }}!</p>
     
-    <!-- Create Post Form -->
+    <!-- Create Post  -->
     <form method="POST" action="{{ url_for('feed') }}">
       <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?"></textarea>
       <button type="submit" class="btn btn-success mt-3">Post</button>
     </form>
 
- <!-- Posts Section -->
+ <!-- Posts  -->
  <div class="row mt-4">
   {% for post in posts %}
   <div class="col-md-6 mb-4">
@@ -86,7 +87,7 @@
           <a href="{{ url_for('like_post', post_id=post.id) }}" class="btn btn-outline-primary">Like ({{ post.likes }})</a>
           <button class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}">Comment</button>
         </div>
-                    <!-- Comments Section -->
+                    <!-- Comments  -->
                     <div id="comments-{{ post.id }}" class="collapse mt-3">
                       <form method="POST" action="{{ url_for('comment_post', post_id=post.id) }}">
                         <textarea name="comment_content" class="form-control" rows="2" placeholder="Add a comment..."></textarea>
