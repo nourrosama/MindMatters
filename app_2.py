@@ -265,16 +265,59 @@ def comment_post(post_id):
     return redirect(url_for("feed"))
 
 
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
     if 'user' not in session:
         return redirect(url_for('login'))
 
+    # Get the logged-in user's email from the session
     user_email = session["user"]
     user = users_collection.find_one({"email": user_email})
+
     if user:
-        return render_template("profile.html", username=user["username"])
-    return redirect(url_for("login"))
+        # Prepare user data
+        profile_data = user.get("profile", {})
+        created_at = profile_data.get("createdAt")
+        updated_at = profile_data.get("updatedAt")
+
+        user_data = {
+            "username": user.get("username"),
+            "email": user.get("email"),
+            "role": user.get("role", "regular"),  # Default role as 'regular' if not found
+            "profile_created_at": created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None,
+            "profile_updated_at": updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None,
+            "followers_count": user.get("followers_count", 0),
+            "bio": user.get("bio", "Welcome to my profile!"),
+            "avatar_url": user.get("avatar_url", "https://via.placeholder.com/100"),
+        }
+
+        # Get the user's latest posts from the ForumPosts collection
+        user_posts = forum_posts_collection.find({"email": user_email}).sort("createdAt", -1).limit(5)
+        posts_data = [
+            {
+                "id": str(post["_id"]),
+                "title": post.get("title", "No title"),
+                "content": post.get("content", "No content"),
+                "author": user_data["username"],  # Use the username from the user's profile
+                "created_at": post.get("createdAt").strftime("%Y-%m-%d %H:%M:%S") if post.get("createdAt") else "Unknown",
+                "likes": post.get("likes", 0),
+                "tags": post.get("tags", []),
+                "comments": [
+                    {
+                        "username": users_collection.find_one({"_id": comment["userId"]}).get("username", "Unknown"),
+                        "content": comment.get("content", ""),
+                        "created_at": comment.get("createdAt").strftime("%Y-%m-%d %H:%M:%S") if comment.get("createdAt") else "Unknown",
+                    }
+                    for comment in post.get("comments", [])
+                ],
+            }
+            for post in user_posts
+        ]
+
+        return render_template("profile.html", user=user_data, posts=posts_data)
+    else:
+        return redirect(url_for('login'))
+    
 
 @app.route("/consultation", methods=["GET"])
 def consultation():
@@ -393,6 +436,10 @@ def logout():
 @app.route("/resources")
 def resources():
     return render_template("resources.html")
+
+@app.route("/messages")
+def messages():
+    return render_template("messages.html")
 
 @app.route("/trigger-404")
 def trigger_404():

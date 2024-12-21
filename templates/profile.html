@@ -40,7 +40,7 @@
     }
     .container {
         margin-top: 100px;
-        max-width: 400px;
+        max-width: 700px;
     }
     .error-message {
         color: red;
@@ -79,88 +79,52 @@
   <div class="container mt-4">
     <div class="row">
       <div class="col-12 text-center">
-        <img src="https://via.placeholder.com/100" alt="User Avatar" class="rounded-circle">
-        <h2>User123</h2>
-        <p>130 Followers</p>
-        <p>Welcome to my profile!</p>
-        <a href="{{ url_for('trigger_404') }}" class="btn btn-primary">Message</a>
+        <img src="{{ user.avatar_url or 'https://via.placeholder.com/100' }}" alt="User Avatar" class="rounded-circle">
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.followers_count }} Followers</p>
+        <p>{{ user.bio or 'Welcome to my profile!' }}</p>
+        <a href="{{ url_for('messages') }}" class="btn btn-primary">Message</a>
       </div>
     </div>
+
+    <hr>
 
     <!-- Latest Posts Section -->
-    <div class="row mt-5">
-      <div class="col-12 text-center">
-        <h3>Latest Posts</h3>
-        <p>Check out and share your own posts</p>
-        <a href="{{ url_for('trigger_404') }}" class="btn btn-success mb-4">Create Post</a>
-      </div>
+    <div class="mt-5">
+      <h3>Your Latest Posts</h3>
+      {% if posts %}
+        <div class="list-group">
+          {% for post in posts %}
+            <div class="list-group-item">
+              <h5>Title: {{ post.title }}</h5>
+              <p>{{ post.content }}</p>
+              <small>Created At: {{ post.created_at }}</small>
+              <p>Likes: {{ post.likes }}</p>
+              <p>Tags: {{ post.tags | join(', ') }}</p>
+              <h6>Comments:</h6>
+              <ul>
+                {% for comment in post.comments %}
+                  <li><strong>{{ comment.username }}</strong>: {{ comment.content }} <small>({{ comment.created_at }})</small></li>
+                {% endfor %}
+              </ul>
+              <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
+                <button type="submit" class="btn btn-danger mt-2">Delete</button>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>You haven't made any posts yet.</p>
+      {% endif %}
     </div>
 
-    <!-- Posts -->
-    <div class="row">
-      <!-- Post Card 1 -->
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <div>
-                <h5 class="card-title">@User123</h5>
-                <h6 class="card-subtitle mb-2 text-muted">2h ago</h6>
-              </div>
-              <div class="dropdown">
-                <button class="btn btn-link text-dark" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                  ...
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                  <li><a class="dropdown-item" href="#">Edit Post</a></li>
-                  <li><a class="dropdown-item" href="#">Delete Post</a></li>
-                </ul>
-              </div>
-            </div>
-            <p class="card-text">Enjoying this amazing view 🌅</p>
-            <img src="https://via.placeholder.com/400x200" alt="Post Image" class="img-fluid mb-2">
-            <p class="text-muted">#sunrise</p>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-outline-primary">Like</button>
-              <button class="btn btn-outline-secondary">
-                Comment <span class="badge bg-secondary">12</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Post Card 2 -->
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <div>
-                <h5 class="card-title">@User123</h5>
-                <h6 class="card-subtitle mb-2 text-muted">1d ago</h6>
-              </div>
-              <div class="dropdown">
-                <button class="btn btn-link text-dark" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                  ...
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                  <li><a class="dropdown-item" href="#">Edit Post</a></li>
-                  <li><a class="dropdown-item" href="#">Delete Post</a></li>
-                </ul>
-              </div>
-            </div>
-            <p class="card-text">Indulging in some delicious treats! 😋</p>
-            <img src="https://via.placeholder.com/400x200" alt="Post Image" class="img-fluid mb-2">
-            <p class="text-muted">#food</p>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-outline-primary">Like</button>
-              <button class="btn btn-outline-secondary">
-                Comment <span class="badge bg-secondary">5</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Create Post Section -->
+    <div class="mt-5">
+      <h3>Create Post</h3>
+      <form method="POST" action="{{ url_for('feed') }}">
+        <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?" required></textarea>
+        <button type="submit" class="btn btn-success mt-3">Post</button>
+      </form>
     </div>
   </div>
 
