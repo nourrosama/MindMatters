@@ -281,22 +281,20 @@ def consultation():
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    # Fetch all consultations with a "confirmed" status from the MongoDB collection
-    consultations = consultations_collection.find({"status": "confirmed"})
+    # Fetch all professionals from the Professionals collection
+    all_doctors = professionals_collection.find()
     doctors = []
-    for consultation in consultations:
-        # Fetch additional professional details from a hypothetical `professionals` collection
-        professional = professionals_collection.find_one({"_id": ObjectId(consultation["professionalId"])})
-        if professional:
-            doctors.append({
-                "id": str(consultation["_id"]),
-                "name": professional.get("name", "Unknown"),
-                "specialty": professional.get("specialty", "N/A"),
-                "image": professional.get("image", "/static/images/default_profile.png"),
-                "description": professional.get("description", "No description available."),
-            })
 
-    return render_template("consultation.html", doctors=list(professional))
+    for professional in all_doctors:
+        doctors.append({
+            "id": str(professional["_id"]),
+            "name": professional.get("name", "Unknown"),
+            "specialty": professional.get("specialty", "N/A"),
+            "image": professional.get("image", "/static/images/default_profile.png"),
+            "description": professional.get("description", "No description available."),
+        })
+
+    return render_template("consultation.html", doctors=doctors)
 
 # View all bookings for the logged-in user
 @app.route("/bookings", methods=["GET"])
@@ -310,13 +308,12 @@ def bookings():
     if not user:
         return redirect(url_for("login"))
 
+    # Aggregate user bookings with professional details
     user_bookings = bookings_collection.aggregate([
-        {
-            "$match": {"userId": user["_id"]}  # Match bookings for the logged-in user
-        },
+        {"$match": {"userId": ObjectId(user["_id"])}},
         {
             "$lookup": {
-                "from": "professionals",
+                "from": "Professionals",
                 "localField": "professionalId",
                 "foreignField": "_id",
                 "as": "professionalDetails"
@@ -324,7 +321,20 @@ def bookings():
         }
     ])
 
-    return render_template("bookings.html", bookings=list(user_bookings))
+    # Convert cursor to list for rendering
+    bookings_list = []
+    for booking in user_bookings:
+        professional = booking["professionalDetails"][0] if booking["professionalDetails"] else {}
+        bookings_list.append({
+            "id": str(booking["_id"]),
+            "dateTime": booking["dateTime"],
+            "status": booking["status"],
+            "notes": booking.get("notes", ""),
+            "professionalName": professional.get("name", "Unknown"),
+            "professionalSpecialty": professional.get("specialty", "N/A"),
+        })
+
+    return render_template("bookings.html", bookings=bookings_list)
 
 # Booking page for a specific professional
 @app.route("/booking/<string:professional_id>", methods=["GET", "POST"])
@@ -346,18 +356,15 @@ def booking(professional_id):
         return redirect(url_for("consultation"))
 
     if request.method == "POST":
-        # Get booking details from the form
         date_time_str = request.form.get("dateTime")
         notes = request.form.get("notes")
 
         try:
-            # Convert the dateTime input to a datetime object
             date_time = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
         except ValueError:
             flash("Invalid date or time format.", "danger")
             return redirect(url_for("booking", professional_id=professional_id))
 
-        # Create a new booking
         new_booking = {
             "userId": user["_id"],
             "professionalId": professional["_id"],
@@ -367,8 +374,6 @@ def booking(professional_id):
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow()
         }
-
-        # Insert into the bookings collection
         bookings_collection.insert_one(new_booking)
         flash("Appointment booked successfully!", "success")
         return redirect(url_for("bookings"))
