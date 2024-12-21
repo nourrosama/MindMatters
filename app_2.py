@@ -385,6 +385,10 @@ def logout():
     #flash("You have been logged out.", "info")
     return redirect(url_for("mainpage"))
 
+@app.route("/resources")
+def resources():
+    return render_template("resources.html")
+
 @app.route("/trigger-404")
 def trigger_404():
     return render_template("404.html"), 404
