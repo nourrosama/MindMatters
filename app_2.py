@@ -375,6 +375,10 @@ def booking(professional_id):
 
     return render_template("booking.html", doctor=professional)
 
+@app.route('/services')
+def services():
+    return render_template('services.html')  # or any other response
+
 @app.route("/logout")
 def logout():
     session.pop("user", None)
