@@ -442,7 +442,7 @@ def services():
 def logout():
     session.pop("user", None)
     flash("You have been logged out.", "info")
-    return redirect(url_for("mainpage"))
+    return render_template('mainpage.html')
 
 @app.route("/resources")
 def resources():

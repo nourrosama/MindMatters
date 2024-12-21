@@ -47,6 +47,11 @@
         font-size: 0.875rem;
         margin-top: 0.5rem;
     }
+    .navbar ul li a:hover,
+    .navbar ul li.active a {
+      text-decoration: underline; 
+      color: #007bff; /* Highlight active page link */
+    }
     .search-bar {
       border: 1px solid #ddd;
       border-radius: 20px;
@@ -63,13 +68,12 @@
       <div class="logo">Mind Matters</div>
       <nav>
         <ul>
-          <li><a href="{{ url_for('feed') }}">Home</a></li>
-          <li><a href="{{ url_for('resources') }}">Resources</a></li>
-          <li><a href="{{ url_for('profile') }}">Profile</a></li>
-          <li><a href="{{ url_for('consultation') }}">Consultation</a></li>
-          <li>
-            <input type="text" class="search-bar" placeholder="Search...">
-          </li>
+          <li class="{% if request.endpoint == 'feed' %}active{% endif %}"><a href="{{ url_for('feed') }}">Home</a></li>
+          <li class="{% if request.endpoint == 'resources' %}active{% endif %}"><a href="{{ url_for('resources') }}">Resources</a></li>
+          <li class="{% if request.endpoint == 'profile' %}active{% endif %}"><a href="{{ url_for('profile') }}">Profile</a></li>
+          <li class="{% if request.endpoint == 'consultation' %}active{% endif %}"><a href="{{ url_for('consultation') }}">Consultation</a></li>
+          <li><input type="text" class="search-bar" placeholder="Search..."></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
       </nav>
     </div>
