@@ -75,67 +75,40 @@
     </div>
   </header>
 
-  <!-- Profile Section -->
-  <div class="container mt-4">
-    <div class="row">
-      <div class="col-12 text-center">
-        <img src="{{ user.avatar_url or 'https://via.placeholder.com/100' }}" alt="User Avatar" class="rounded-circle">
-        <h2>{{ user.username }}</h2>
-        <p>{{ user.followers_count }} Followers</p>
-        <p>{{ user.bio or 'Welcome to my profile!' }}</p>
+ <!-- Profile Section -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>{{ user.username }}</h2>
+      <p>{{ user.followers_count }} Followers</p>
+      <p>{{ user.bio or 'Welcome to my profile!' }}</p>
+      <div class="d-flex justify-content-center gap-2 mt-3">
         <a href="{{ url_for('messages') }}" class="btn btn-primary">Message</a>
-      </div>
-    </div>
-
-    <hr>
-
-    <!-- Latest Posts Section -->
-    <div class="mt-5">
-      <h3>Your Latest Posts</h3>
-      {% if posts %}
-        <div class="list-group">
-          {% for post in posts %}
-            <div class="list-group-item">
-              <h5>Title: {{ post.title }}</h5>
-              <p>{{ post.content }}</p>
-              <small>Created At: {{ post.created_at }}</small>
-              <p>Likes: {{ post.likes }}</p>
-              <p>Tags: {{ post.tags | join(', ') }}</p>
-              <h6>Comments:</h6>
-              <ul>
-                {% for comment in post.comments %}
-                  <li><strong>{{ comment.username }}</strong>: {{ comment.content }} <small>({{ comment.created_at }})</small></li>
-                {% endfor %}
-              </ul>
-              <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
-                <button type="submit" class="btn btn-danger mt-2">Delete</button>
-              </form>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p>You haven't made any posts yet.</p>
-      {% endif %}
-    </div>
-
-    <!-- Create Post Section -->
-    <div class="mt-5">
-      <h3>Create Post</h3>
-      <form method="POST" action="{{ url_for('feed') }}">
-        <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?" required></textarea>
-        <button type="submit" class="btn btn-success mt-3">Post</button>
-      </form>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-secondary">Edit Profile</a>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="footer mt-auto py-3 bg-light text-center">
-    <div class="container">
-      <p class="mb-0"><a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
-    </div>
-  </footer>
+  <hr>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Posts Section -->
+  <!-- Create Post Section -->
+  <div class="mt-5">
+    <h3>Create Post</h3>
+    <form method="POST" action="{{ url_for('feed') }}">
+      <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?" required></textarea>
+      <button type="submit" class="btn btn-success mt-3">Post</button>
+    </form>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3 bg-light text-center">
+  <div class="container">
+    <p class="mb-0"><a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

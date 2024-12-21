@@ -119,7 +119,7 @@ def signup():
         confirm_password = request.form.get("confirm-password")
 
         if password != confirm_password:
-            #flash("Passwords do not match!", "danger")
+            flash("Passwords do not match!", "danger")
             return render_template("signup.html")
 
         existing_user = users_collection.find_one({"email": email})
@@ -157,7 +157,7 @@ def login():
             flash("Login successful!", "success")
             return redirect(url_for("feed"))
         else:
-            #flash("Invalid email or password.", "danger")
+            flash("Invalid email or password.", "danger")
             return render_template("login.html")
 
     return render_template("login.html")
@@ -291,33 +291,44 @@ def profile():
             "avatar_url": user.get("avatar_url", "https://via.placeholder.com/100"),
         }
 
-        # Get the user's latest posts from the ForumPosts collection
-        user_posts = forum_posts_collection.find({"email": user_email}).sort("createdAt", -1).limit(5)
-        posts_data = [
-            {
-                "id": str(post["_id"]),
-                "title": post.get("title", "No title"),
-                "content": post.get("content", "No content"),
-                "author": user_data["username"],  # Use the username from the user's profile
-                "created_at": post.get("createdAt").strftime("%Y-%m-%d %H:%M:%S") if post.get("createdAt") else "Unknown",
-                "likes": post.get("likes", 0),
-                "tags": post.get("tags", []),
-                "comments": [
-                    {
-                        "username": users_collection.find_one({"_id": comment["userId"]}).get("username", "Unknown"),
-                        "content": comment.get("content", ""),
-                        "created_at": comment.get("createdAt").strftime("%Y-%m-%d %H:%M:%S") if comment.get("createdAt") else "Unknown",
-                    }
-                    for comment in post.get("comments", [])
-                ],
-            }
-            for post in user_posts
-        ]
-
-        return render_template("profile.html", user=user_data, posts=posts_data)
+        return render_template("profile.html", user=user_data)
     else:
         return redirect(url_for('login'))
     
+
+@app.route("/edit_profile", methods=["GET", "POST"])
+def edit_profile():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user_email = session["user"]
+    user = users_collection.find_one({"email": user_email})
+
+    if user:
+        if request.method == "POST":
+            bio = request.form.get("bio")
+            avatar_url = request.form.get("avatar_url")
+
+            # Update user profile data
+            users_collection.update_one(
+                {"email": user_email},
+                {
+                    "$set": {
+                        "bio": bio,
+                        "avatar_url": avatar_url,
+                        "profile.updatedAt": datetime.utcnow()
+                    }
+
+                }
+            )
+            flash("Profile updated successfully!", "success")
+            return redirect(url_for("profile"))
+
+        return render_template("edit_profile.html", user=user)
+    else:
+        return redirect(url_for('login'))
+    
+
 
 @app.route("/consultation", methods=["GET"])
 def consultation():
@@ -430,7 +441,7 @@ def services():
 @app.route("/logout")
 def logout():
     session.pop("user", None)
-    #flash("You have been logged out.", "info")
+    flash("You have been logged out.", "info")
     return redirect(url_for("mainpage"))
 
 @app.route("/resources")
