@@ -12,11 +12,16 @@
   <nav class="navbar navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="index.html">Mind Matters</a>
-      <ul class="nav">
-        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link active" href="#">Messages</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Log out</a></li>
-      </ul>
+      <nav>
+        <ul>
+          <li class="{% if request.endpoint == 'feed' %}active{% endif %}"><a href="{{ url_for('feed') }}">Home</a></li>
+          <li class="{% if request.endpoint == 'resources' %}active{% endif %}"><a href="{{ url_for('resources') }}">Resources</a></li>
+          <li class="{% if request.endpoint == 'profile' %}active{% endif %}"><a href="{{ url_for('profile') }}">Profile</a></li>
+          <li class="{% if request.endpoint == 'consultation' %}active{% endif %}"><a href="{{ url_for('consultation') }}">Consultation</a></li>
+          <li><input type="text" class="search-bar" placeholder="Search..."></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </nav>
     </div>
   </nav>
 
