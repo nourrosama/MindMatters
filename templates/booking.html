@@ -20,31 +20,45 @@
     }
 
     .profile-section img {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
     }
 
     .calendar-section {
-      font-size: 1.2rem; /* Increase font size for better readability */
+      font-size: 1rem;
     }
 
-    .calendar-section .btn {
-      background-color: #e8f0fe;
-      border: none;
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      text-align: center;
+    }
+
+    .calendar-grid button {
+      width: 100%;
+      padding: 15px 0; 
+      border: 1px solid #007bff;
       color: #007bff;
+      background-color: #ffffff;
+      border-radius: 5px;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.5rem; /* Larger navigation buttons */
     }
 
-    .calendar-section .btn.active {
+    .calendar-grid button:hover,
+    .calendar-grid button.active {
       background-color: #007bff;
       color: #ffffff;
     }
 
-    .calendar-section .row div {
-      padding: 10px 0; /* Add spacing for larger cells */
-      font-size: 1.2rem; /* Larger numbers for the calendar */
+    .time-section {
+      margin-top: 20px;
+    }
+
+    .time-slot {
+      margin-top: 10px;
     }
 
     .time-slot button {
@@ -54,13 +68,10 @@
       color: #007bff;
       background-color: #ffffff;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
 
-    .time-slot button:hover {
-      background-color: #007bff;
-      color: #ffffff;
-    }
-
+    .time-slot button:hover,
     .time-slot button.active {
       background-color: #007bff;
       color: #ffffff;

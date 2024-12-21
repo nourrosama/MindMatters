@@ -119,7 +119,7 @@ def signup():
         confirm_password = request.form.get("confirm-password")
 
         if password != confirm_password:
-            flash("Passwords do not match!", "danger")
+            #flash("Passwords do not match!", "danger")
             return render_template("signup.html")
 
         existing_user = users_collection.find_one({"email": email})
@@ -157,7 +157,7 @@ def login():
             flash("Login successful!", "success")
             return redirect(url_for("feed"))
         else:
-            flash("Invalid email or password.", "danger")
+            #flash("Invalid email or password.", "danger")
             return render_template("login.html")
 
     return render_template("login.html")
@@ -179,7 +179,6 @@ def authorize_google():
     token = google.authorize_access_token()
     user_info = google.get('userinfo').json()
     
-    # Store user information in the session
     session['user'] = {
         'provider': 'Google',
         'name': user_info.get('name'),
@@ -187,7 +186,8 @@ def authorize_google():
         'picture': user_info.get('picture')
     }
 
-    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+
+    return redirect(url_for("feed")) 
 
 @app.route("/login/facebook")
 def login_facebook():
@@ -198,15 +198,9 @@ def authorize_facebook():
     token = facebook.authorize_access_token()
     user_info = facebook.get('me?fields=id,name,email,picture').json()
 
-    # Store user information in the session
-    session['user'] = {
-        'provider': 'Facebook',
-        'name': user_info.get('name'),
-        'email': user_info.get('email'),
-        'picture': user_info['picture']['data']['url']
-    }
 
-    return redirect(url_for("feed"))  # Redirect to your feed or dashboard
+
+    return redirect(url_for("feed"))  
 
 @app.route("/like_post/<string:post_id>", methods=["GET", "POST"])
 def like_post(post_id):
@@ -246,7 +240,6 @@ def like_post(post_id):
 def comment_post(post_id):
     if "user" not in session:
         return redirect(url_for("login"))
-
     comment_content = request.form.get("comment_content")
     user_email = session["user"]
 
@@ -384,12 +377,12 @@ def booking(professional_id):
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)  # Remove the user from session
-    flash("You have been logged out.", "info")
+    session.pop("user", None)
+    #flash("You have been logged out.", "info")
     return redirect(url_for("mainpage"))
 
-@app.errorhandler(404)
-def page_not_found(e):
+@app.route("/trigger-404")
+def trigger_404():
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
