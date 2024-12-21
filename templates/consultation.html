@@ -109,7 +109,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ doctor['name'] }}</h5>
                             <p class="card-text">{{ doctor['description'] }}</p>
-                            <a href="{{ url_for('booking', doctor_id=doctor['id']) }}" class="btn btn-primary mt-3">Book Appointment</a>
+                            <a href="{{ url_for('booking', professional_id=doctor['id']) }}" class="btn btn-primary mt-3">Book Appointment</a>
                         </div>
                     </div>
                 </div>

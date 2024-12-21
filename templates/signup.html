@@ -50,6 +50,13 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
     <header>
         <div class="navbar">
             <div class="logo">MindMatters</div>
@@ -77,13 +84,13 @@
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="form-control" id="password" name="password" required onpaste="return false;">
                 <input type="checkbox" onclick="togglePassword('password')"> Show Password
                 <div id="password-error" class="error-message"></div>
             </div>
             <div class="mb-3">
                 <label for="confirm-password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm-password" name="confirm-password" required>
+                <input type="password" class="form-control" id="confirm-password" name="confirm-password" required onpaste="return false;">
                 <input type="checkbox" onclick="togglePassword('confirm-password')"> Show Password
                 <div id="confirm-password-error" class="error-message"></div>
             </div>
@@ -143,6 +150,12 @@
 
             return isValid; 
         }
+        document.querySelectorAll('input[type="password"]').forEach(input => {
+            input.addEventListener('paste', (event) => {
+                event.preventDefault();
+                alert('Pasting into password fields is not allowed.');
+            });
+        });
     </script>
 </body>
 </html>

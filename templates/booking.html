@@ -81,78 +81,33 @@
 <body>
   <div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-8 booking-container">
-        <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
-        <div class="row">
-          <div class="col-md-3 text-center profile-section">
-            <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
-            <h5 class="mt-2">{{ doctor['name'] }}</h5>
-            <p class="text-muted">{{ doctor['specialty'] }}</p>
-          </div>
-          <!-- Time Slots  -->
-          <div class="col-md-3 time-section">
-            <h5>Available Time Slots</h5>
-            <ul class="list-group">
-              <li class="list-group-item">9:00 AM - 10:00 AM</li>
-              <li class="list-group-item">10:00 AM - 11:00 AM</li>
-              <li class="list-group-item">11:00 AM - 12:00 PM</li>
-              <li class="list-group-item">1:00 PM - 2:00 PM</li>
-            </ul>
-            <a href="{{ url_for('trigger_404') }}" class="btn btn-primary mt-4 w-100">Confirm Appointment</a>
-          </div>
-
-          <!-- Calendar  -->
-          <div class="col-md-9 calendar-section">
-            <h5 class="text-center">Select a Date</h5>
-            <p class="text-center fs-4">July 2024</p>
-            <div class="calendar-grid">
-              <div>Sun</div>
-              <div>Mon</div>
-              <div>Tue</div>
-              <div>Wed</div>
-              <div>Thu</div>
-              <div>Fri</div>
-              <div>Sat</div>
-              <!-- Empty cells for days before the month starts -->
-              <div></div><div></div><div></div><div></div><div></div>
-              <button>1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>4</button>
-              <button>5</button>
-              <button>6</button>
-              <button>7</button>
-              <button>8</button>
-              <button>9</button>
-              <button>10</button>
-              <button>11</button>
-              <button>12</button>
-              <button>13</button>
-              <button>14</button>
-              <button>15</button>
-              <button>16</button>
-              <button>17</button>
-              <button>18</button>
-              <button>19</button>
-              <button>20</button>
-              <button>21</button>
-              <button>22</button>
-              <button>23</button>
-              <button>24</button>
-              <button>25</button>
-              <button>26</button>
-              <button>27</button>
-              <button>28</button>
-              <button>29</button>
-              <button>30</button>
-              <button>31</button>
+        <div class="col-md-8 booking-container">
+            <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
+            <div class="row">
+                <div class="col-md-3 text-center profile-section">
+                    <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
+                    <h5 class="mt-2">{{ doctor['name'] }}</h5>
+                    <p class="text-muted">{{ doctor['specialty'] }}</p>
+                </div>
+                <div class="col-md-9 calendar-section">
+                    <h5>Select Date and Time</h5>
+                    <form method="POST" action="{{ url_for('booking', professional_id=doctor['_id']) }}">
+                        <div class="mb-3">
+                            <label for="dateTime" class="form-label">Select Date and Time</label>
+                            <input type="datetime-local" id="dateTime" name="dateTime" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Additional Notes</label>
+                            <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+                    </form>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

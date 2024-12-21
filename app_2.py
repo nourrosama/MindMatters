@@ -1,7 +1,56 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from datetime import datetime 
 import secrets
 from authlib.integrations.flask_client import OAuth
+from bson import ObjectId
+from flask_pymongo import PyMongo
+from pymongo import MongoClient
+from werkzeug.security import generate_password_hash, check_password_hash
+
+app = Flask(__name__)
+app.secret_key = "your_secret_key"  # Replace with a secure key
+
+## MongoDB Configuration
+#app.config["MONGO_URI"] = "mongodb://localhost:27017/MindMatters"
+#mongo = PyMongo(app)
+
+# Initialize MongoDB connection
+client = MongoClient("mongodb://localhost:27017/")
+db = client["MindMatters"]  # Replace with your actual database name
+
+# Collections
+users_collection = db['Users']
+journals_collection = db['JournalEntries']
+consultations_collection = db['Consultations']
+surveys_collection = db['Surveys']
+forum_posts_collection = db['ForumPosts']
+notifications_collection = db['Notifications']
+resources_collection = db['Resources']
+professionals_collection = db['Professionals']
+bookings_collection = db['Bookings']
+
+## Update posts missing `createdAt`
+#forum_posts_collection.update_many(
+#    {"createdAt": {"$exists": False}},  # Find documents without `createdAt`
+#    {"$set": {"createdAt": datetime.utcnow()}}  # Set default value
+#)
+
+# Test route to get all users
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = list(users_collection.find())
+    for user in users:
+        user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON response
+#    return jsonify(users)
+
+# Route to add a new user
+@app.route("/users", methods=["POST"])
+def add_user():
+    data = request.json
+    data["createdAt"] = datetime.datetime.utcnow()
+    data["updatedAt"] = datetime.datetime.utcnow()
+    inserted = users_collection.insert_one(data)
+    return jsonify({"message": "User added", "id": str(inserted.inserted_id)})
 
 
 # Generate a random 32-byte string and encode it in hexadecimal
@@ -34,61 +83,33 @@ facebook = oauth.register(
     client_kwargs={'scope': 'email'}
 )
 
-users_db = {
-    "user1@example.com": {"username": "user1", "password": "password123"},
-    "user2@example.com": {"username": "user2", "password": "password456"}
-}
+# Feed Route
+@app.route("/feed", methods=["GET", "POST"])
+def feed():
+    user_email = session.get("user")  # Get the user from the session
+    if not user_email:
+        return redirect(url_for("login"))  # Redirect to login if not logged in
 
-posts_db = [
-    {
-        "id": 1,
-        "username": "user1",
-        "content": "Hello, world! This is my first post.",
-        "likes": 3,
-        "created_at": datetime.now()
-    },
-    {
-        "id": 2,
-        "username": "user2",
-        "content": "Feeling great today! 😊",
-        "likes": 5,
-        "created_at": datetime.now()
-    }
-]
+    user = users_collection.find_one({"email": user_email})  # Fetch user from MongoDB
+    if user:
+        if request.method == "POST":
+            post_content = request.form.get("post_content")
+            if post_content and post_content.strip():
+                new_post = {
+                    "username": user["username"],
+                    "content": post_content.strip(),
+                    "likes": 0,
+                    "createdAt": datetime.utcnow()
+                }
+                forum_posts_collection.insert_one(new_post)  # Insert new post into MongoDB
 
-likes_tracking = {}
-comments_db = {}
-doctors = [
-    {
-        "id": 1,
-        "name": "Dr. Jane Doe",
-        "specialty": "Clinical Psychologist",
-        "experience": "10+ years",
-        "description": "Specializes in cognitive behavioral therapy and anxiety management.",
-        "image": "https://via.placeholder.com/100"
-    },
-    {
-        "id": 2,
-        "name": "Dr. John Smith",
-        "specialty": "Psychiatrist",
-        "experience": "15 years",
-        "description": "Focuses on mood disorders and depression treatment.",
-        "image": "https://via.placeholder.com/100"
-    },
-    {
-        "id": 3,
-        "name": "Dr. Sarah Lee",
-        "specialty": "Family Counselor",
-        "experience": "12 years",
-        "description": "Expert in family counseling and child development.",
-        "image": "https://via.placeholder.com/100"
-    }
-]
-@app.route("/")
-def home():
-    if "user" in session:
-        return redirect(url_for("feed"))
-    return render_template("mainpage.html")
+        # Fetch all posts sorted by creation time in descending order
+        posts = list(forum_posts_collection.find().sort("createdAt", -1))
+        return render_template("feed.html", username=user["username"], posts=posts)
+
+    return redirect(url_for("login"))
+
+# Signup Route
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -101,34 +122,54 @@ def signup():
             #flash("Passwords do not match!", "danger")
             return render_template("signup.html")
 
-        if email in users_db:
-            #flash("Email is already registered!", "danger")
-            return render_template("signup.html")
-        users_db[email] = {"username": username, "password": password}
-        
-        session["user"] = email
-        #flash("Signup successful! Welcome!", "success")
-        return redirect(url_for("feed"))
+        existing_user = users_collection.find_one({"email": email})
+        hashed_password = generate_password_hash(password)
+
+        if existing_user:
+            flash("Email is already registered. Please log in.", "info")
+            return redirect(url_for("login"))
+        else:
+            users_collection.insert_one({
+                "username": username,
+                "email": email,
+                "password": hashed_password,
+                "role": "regular",
+                "profile": {
+                    "createdAt": datetime.utcnow(),
+                    "updatedAt": datetime.utcnow(),
+                }
+            })
+            flash("Signup successful! Please log in to continue.", "success")
+            return redirect(url_for("login"))
 
     return render_template("signup.html")
 
+# Login Route
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
 
-        user = users_db.get(email)
-        if user and user["password"] == password:
-            session["user"] = email  
-            #flash("Login successful!", "success")
+        user = users_collection.find_one({"email": email})
+        if user and check_password_hash(user["password"], password):
+            session["user"] = email  # Store session
+            flash("Login successful!", "success")
             return redirect(url_for("feed"))
         else:
             #flash("Invalid email or password.", "danger")
             return render_template("login.html")
-    
+
     return render_template("login.html")
 
+# Home Route
+@app.route("/")
+def home():
+    if "user" in session:
+        return redirect(url_for("feed"))
+    return render_template("mainpage.html")
+
+#Oauth
 @app.route("/login/google")
 def login_google():
     return google.authorize_redirect(url_for("authorize_google", _external=True))
@@ -161,83 +202,68 @@ def authorize_facebook():
 
     return redirect(url_for("feed"))  
 
-@app.route("/feed", methods=["GET", "POST"])
-def feed():
-    user_email = session.get("user")  
-    if not user_email:
-        return redirect(url_for("login"))  
-
-    user = users_db.get(user_email)  
-
-    if user:
-        if request.method == "POST":
-            post_content = request.form.get("post_content")
-            if post_content and post_content.strip():
-                new_post = {
-                    "id": len(posts_db) + 1,
-                    "username": user["username"],
-                    "content": post_content.strip(),
-                    "likes": 0,
-                    "created_at": datetime.now()
-                }
-                posts_db.insert(0, new_post)  
-
-        return render_template(
-            "feed.html", 
-            username=user["username"], 
-            posts=posts_db, 
-            comments_db=comments_db
-        )
-    return redirect(url_for("login"))
-
-@app.route("/services")
-def services():
-    return render_template("service.html")  
-
-@app.route("/resources")
-def resources():
-    return render_template("resources.html")
-
-@app.route("/like_post/<int:post_id>")
+@app.route("/like_post/<string:post_id>", methods=["GET", "POST"])
 def like_post(post_id):
     if "user" not in session:
         return redirect(url_for("login"))
 
     user_email = session["user"]
-    post = next((p for p in posts_db if p["id"] == post_id), None)
+
+    # Find the post by ID
+    post = forum_posts_collection.find_one({"_id": ObjectId(post_id)})
 
     if post:
-        if post_id not in likes_tracking:
-            likes_tracking[post_id] = set()
+        # Initialize the `likes_tracking` field if it doesn't exist
+        if "likes_tracking" not in post:
+            post["likes_tracking"] = []
 
-        if user_email in likes_tracking[post_id]:
-            #flash("You can only like a post once.", "warning")
-        #else:
-            likes_tracking[post_id].add(user_email)
-            post["likes"] += 1
-            #flash("Post liked!", "success")
+        # Check if the user has already liked the post
+        if user_email in post["likes_tracking"]:
+            flash("You can only like a post once.", "warning")
+        else:
+            # Add the user's email to the `likes_tracking` list and increment the like count
+            forum_posts_collection.update_one(
+                {"_id": ObjectId(post_id)},
+                {
+                    "$addToSet": {"likes_tracking": user_email},
+                    "$inc": {"likes": 1}
+                }
+            )
+            flash("Post liked!", "success")
+    else:
+        flash("Post not found.", "danger")
 
     return redirect(url_for("feed"))
 
-@app.route("/comment_post/<int:post_id>", methods=["POST"])
+
+@app.route("/comment_post/<string:post_id>", methods=["POST"])
 def comment_post(post_id):
     if "user" not in session:
         return redirect(url_for("login"))
     comment_content = request.form.get("comment_content")
     user_email = session["user"]
-    user = users_db.get(user_email)
+
+    # Find the user by email
+    user = users_collection.find_one({"email": user_email})
+
     if user and comment_content.strip():
         comment = {
             "username": user["username"],
-            "content": comment_content,
-            "created_at": datetime.now()
+            "content": comment_content.strip(),
+            "createdAt": datetime.utcnow()
         }
-        if post_id not in comments_db:
-            comments_db[post_id] = []
-        comments_db[post_id].append(comment)
-        #flash("Comment added!", "success")
-    
+
+        # Add the comment to the `comments` field in the post
+        forum_posts_collection.update_one(
+            {"_id": ObjectId(post_id)},
+            {"$push": {"comments": comment}}
+        )
+        flash("Comment added!", "success")
+    else:
+        flash("Unable to add comment.", "danger")
+
     return redirect(url_for("feed"))
+
 
 @app.route("/profile")
 def profile():
@@ -245,7 +271,7 @@ def profile():
         return redirect(url_for('login'))
 
     user_email = session["user"]
-    user = users_db.get(user_email)
+    user = users_collection.find_one({"email": user_email})
     if user:
         return render_template("profile.html", username=user["username"])
     return redirect(url_for("login"))
@@ -255,19 +281,99 @@ def consultation():
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    return render_template("consultation.html", doctors=doctors)
+    # Fetch all consultations with a "confirmed" status from the MongoDB collection
+    consultations = consultations_collection.find({"status": "confirmed"})
+    doctors = []
+    for consultation in consultations:
+        # Fetch additional professional details from a hypothetical `professionals` collection
+        professional = professionals_collection.find_one({"_id": ObjectId(consultation["professionalId"])})
+        if professional:
+            doctors.append({
+                "id": str(consultation["_id"]),
+                "name": professional.get("name", "Unknown"),
+                "specialty": professional.get("specialty", "N/A"),
+                "image": professional.get("image", "/static/images/default_profile.png"),
+                "description": professional.get("description", "No description available."),
+            })
 
-@app.route("/booking/<int:doctor_id>")
-def booking(doctor_id):
-    if 'user' not in session:
-        return redirect(url_for('login'))
+    return render_template("consultation.html", doctors=list(professional))
 
-    doctor = next((doc for doc in doctors if doc["id"] == doctor_id), None)
-    if not doctor:
-        #flash("Doctor not found.", "danger")
+# View all bookings for the logged-in user
+@app.route("/bookings", methods=["GET"])
+def bookings():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    user_email = session["user"]
+    user = users_collection.find_one({"email": user_email})
+
+    if not user:
+        return redirect(url_for("login"))
+
+    user_bookings = bookings_collection.aggregate([
+        {
+            "$match": {"userId": user["_id"]}  # Match bookings for the logged-in user
+        },
+        {
+            "$lookup": {
+                "from": "professionals",
+                "localField": "professionalId",
+                "foreignField": "_id",
+                "as": "professionalDetails"
+            }
+        }
+    ])
+
+    return render_template("bookings.html", bookings=list(user_bookings))
+
+# Booking page for a specific professional
+@app.route("/booking/<string:professional_id>", methods=["GET", "POST"])
+def booking(professional_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    user_email = session["user"]
+    user = users_collection.find_one({"email": user_email})
+
+    if not user:
+        flash("User not found. Please log in again.", "danger")
+        return redirect(url_for("login"))
+
+    professional = professionals_collection.find_one({"_id": ObjectId(professional_id)})
+
+    if not professional:
+        flash("Professional not found.", "danger")
         return redirect(url_for("consultation"))
-    
-    return render_template("booking.html", doctor=doctor)
+
+    if request.method == "POST":
+        # Get booking details from the form
+        date_time_str = request.form.get("dateTime")
+        notes = request.form.get("notes")
+
+        try:
+            # Convert the dateTime input to a datetime object
+            date_time = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
+        except ValueError:
+            flash("Invalid date or time format.", "danger")
+            return redirect(url_for("booking", professional_id=professional_id))
+
+        # Create a new booking
+        new_booking = {
+            "userId": user["_id"],
+            "professionalId": professional["_id"],
+            "dateTime": date_time,
+            "status": "pending",
+            "notes": notes,
+            "createdAt": datetime.utcnow(),
+            "updatedAt": datetime.utcnow()
+        }
+
+        # Insert into the bookings collection
+        bookings_collection.insert_one(new_booking)
+        flash("Appointment booked successfully!", "success")
+        return redirect(url_for("bookings"))
+
+    return render_template("booking.html", doctor=professional)
 
 @app.route("/logout")
 def logout():
