@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymized Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Anonymized User Data</h1>
+        <ul id="data-list">
+            <!-- Anonymized data will be displayed here -->
+        </ul>
+    </div>
+    <script>
+        fetch('/api/anonymized-data')
+            .then(response => response.json())
+            .then(data => {
+                const dataList = document.getElementById('data-list');
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = JSON.stringify(item);
+                    dataList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching anonymized data:', error));
+    </script>
+</body>
+</html>
