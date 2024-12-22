@@ -445,13 +445,6 @@ def booking(professional_id):
 
     return render_template("booking.html", doctor=professional)
 
-@app.route('/')
-def index():
-    # Fetch past entries
-    entries = list(journals_collection.find().sort("createdAt", -1))
-    for entry in entries:
-        entry["_id"] = str(entry["_id"])  # Convert ObjectId to string for JSON serialization
-    return render_template('mood_tracking.html', entries=entries)
 
 
 @app.route('/save', methods=['POST'])
