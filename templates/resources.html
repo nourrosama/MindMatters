@@ -36,14 +36,6 @@
     .navbar ul li a:hover {
       text-decoration: underline; 
     }
-    .search-bar {
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 0.4rem 1rem;
-      font-size: 1rem;
-      width: 200px;
-    }
-
     .treatment-img {
       width: 150px; 
       height: 150px; 
@@ -77,7 +69,6 @@
           <li class="{% if request.endpoint == 'resources' %}active{% endif %}"><a href="{{ url_for('resources') }}">Resources</a></li>
           <li class="{% if request.endpoint == 'profile' %}active{% endif %}"><a href="{{ url_for('profile') }}">Profile</a></li>
           <li class="{% if request.endpoint == 'consultation' %}active{% endif %}"><a href="{{ url_for('consultation') }}">Consultation</a></li>
-          <li><input type="text" class="search-bar" placeholder="Search..."></li>
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
       </nav>
