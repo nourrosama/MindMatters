@@ -450,9 +450,54 @@ def booking(professional_id):
         return redirect(url_for("bookings"))
 
     return render_template("booking.html", doctor=professional)
+# not work aaccording to the database
 
+# @app.route('/save', methods=['POST'])
+# def save_entry():
+#     mood = request.form.get('mood')
+#     reflections = request.form.get('reflections')
+#     tags = request.form.getlist('tags')
 
+#     new_entry = {
+#         "mood": mood,
+#         "reflections": reflections,
+#         "tags": tags,
+#         "createdAt": datetime.utcnow(),
+#         "updatedAt": datetime.utcnow(),
+#     }
+#     journals_collection.insert_one(new_entry)
+#     return redirect(url_for("profile"))
 
+# @app.route('/update', methods=['POST'])
+# def update_mood():
+#     data = request.json
+#     user_id = data.get("userId")
+#     mood_entry = {
+#         "date": {"$date": data.get("date")},
+#         "mood": data.get("mood")
+#     }
+
+#     result = analysis_collection.update_one(
+#         {"userId": ObjectId(user_id)},
+#         {"$push": {"moodData": mood_entry}, "$set": {"updatedAt": datetime.now()}},
+#         upsert=True
+#     )
+#     return jsonify({"success": True, "matched_count": result.matched_count, "modified_count": result.modified_count})
+
+# @app.route('/get_mood_graph/<user_id>', methods=['GET'])
+# def get_mood_graph(user_id):
+#     user_data = analysis_collection.find_one({"userId": ObjectId(user_id)})
+
+#     if not user_data or 'moodData' not in user_data:
+#         return jsonify({"error": "No mood data found for this user."}), 404
+
+#     mood_data = user_data['moodData']
+
+#     # Send the mood data as JSON for the frontend
+#     return jsonify({
+#         "success": True,
+#         "moodData": mood_data
+#     })
 @app.route('/save', methods=['POST'])
 def save_entry():
     # Collect form data
@@ -524,7 +569,7 @@ def mood_tracking():
 
 @app.route('/services')
 def services():
-    return render_template('services.html')  # or any other response
+    return render_template('services.html')  
 
 @app.route("/logout")
 def logout():
@@ -534,7 +579,6 @@ def logout():
 
 @app.route("/mood_analysis")
 def mood_analysis():
-    # Logic to render mood analysis page
     return render_template('mood_analysis.html')
 
 
