@@ -388,7 +388,7 @@ def bookings():
             "professionalSpecialty": professional.get("specialty", "N/A"),
         })
 
-    return render_template("bookings.html", bookings=bookings_list)
+    return render_template("booking.html", doctor=professional, bookings=bookings_list)
 
 # Booking page for a specific professional
 @app.route("/booking/<string:professional_id>", methods=["GET", "POST"])
@@ -407,8 +407,9 @@ def booking(professional_id):
 
     if not professional:
         flash("Professional not found.", "danger")
+        print(f"No professional found with ID: {professional_id}")
         return redirect(url_for("consultation"))
-
+    
     if request.method == "POST":
         date_time_str = request.form.get("dateTime")
         notes = request.form.get("notes")
@@ -429,6 +430,16 @@ def booking(professional_id):
             "updatedAt": datetime.utcnow()
         }
         bookings_collection.insert_one(new_booking)
+        
+          # Update the professional collection
+        professionals_collection.update_one(
+            {"_id": ObjectId(professional_id)},
+            {
+                "$inc": {"bookingCount": 1},  # Increment booking count by 1
+                "$set": {"lastBookingDate": date_time},  # Update the last booking date
+            }
+        )
+
         flash("Appointment booked successfully!", "success")
         return redirect(url_for("bookings"))
 

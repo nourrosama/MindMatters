@@ -89,7 +89,7 @@
   <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 booking-container">
-            <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] }}</h3>
+            <h3 class="text-center mb-4">Book an Appointment with {{ doctor['name'] if doctor else 'a Doctor' }}
             <div class="row">
                 <div class="col-md-3 text-center profile-section">
                     <img src="{{ doctor['image'] }}" alt="{{ doctor['name'] }}" class="img-fluid rounded-circle">
