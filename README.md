@@ -18,8 +18,6 @@ MindMatters is a comprehensive mental health platform designed to provide users 
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker
 - **Documentation**: Swagger
-- **Notifications Service**: One Signal
-- **Authentication & Authorization**: Passport.js with OAuth2 for third-party login (Google, Facebook) and JWT for secure API access control.
 
 # MindMatters - Flask OAuth Application
 
