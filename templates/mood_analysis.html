@@ -1,3 +1,91 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Mood Analytics</title> -->
+    <!-- Bootstrap CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .section-title {
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h2 class="section-title">Daily Mood Analytics</h2>
+        <div class="card p-4">
+            <p>View analytics on your mood trends over time:</p>
+            <canvas id="moodChart" style="height: 300px;"></canvas>
+            <div class="mt-4">
+                <p><strong>Summary:</strong> Identifying patterns in your mood can help improve well-being.</p>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Bootstrap Bundle with Popper -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- Chart.js for graphs -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Replace with the actual user ID
+        const userId = 'USER_ID';
+
+        // Fetch mood data from the backend
+        fetch(`/get_mood_graph/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('No mood data found for this user.');
+                    return;
+                }
+
+                // Prepare the data for the graph
+                const dates = data.moodData.map(entry => new Date(entry.date).toLocaleDateString());
+                const moods = data.moodData.map(entry => entry.mood);
+
+                // Create the chart
+                const ctx = document.getElementById('moodChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Mood Levels',
+                            data: moods,
+                            borderColor: '#007bff',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching mood data:', error);
+            });
+    </script>
+</body>
+</html>  -->
+<!-- Compare this snippet from templates/exercise.html: -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,4 +150,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
