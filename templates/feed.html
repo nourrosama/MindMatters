@@ -52,13 +52,14 @@
   {% endwith %}
   <header>
     <div class="navbar">
-      <div class="logo">MindMatters</div>
+      <div class="logo">Mind Matters</div>
       <nav>
         <ul>
           <li class="{% if request.endpoint == 'feed' %}active{% endif %}"><a href="{{ url_for('feed') }}">Home</a></li>
           <li class="{% if request.endpoint == 'resources' %}active{% endif %}"><a href="{{ url_for('resources') }}">Resources</a></li>
           <li class="{% if request.endpoint == 'profile' %}active{% endif %}"><a href="{{ url_for('profile') }}">Profile</a></li>
           <li class="{% if request.endpoint == 'consultation' %}active{% endif %}"><a href="{{ url_for('consultation') }}">Consultation</a></li>
+          <li class="{% if request.endpoint == 'exercise' %}active{% endif %}"><a href="{{ url_for('exercise') }}">Exercise</a></li>
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
       </nav>
