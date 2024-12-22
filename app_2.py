@@ -6,6 +6,9 @@ from bson import ObjectId
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
+import matplotlib.pyplot as plt
+import io
+import base64
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Replace with a secure key
@@ -28,6 +31,7 @@ notifications_collection = db['Notifications']
 resources_collection = db['Resources']
 professionals_collection = db['Professionals']
 bookings_collection = db['Bookings']
+analysis_collection = db['Analysis']
 
 ## Update posts missing `createdAt`
 #forum_posts_collection.update_many(
@@ -83,7 +87,7 @@ facebook = oauth.register(
     client_kwargs={'scope': 'email'}
 )
 
-# Feed Route
+
 @app.route("/feed", methods=["GET", "POST"])
 def feed():
     user_email = session.get("user")  # Get the user from the session
@@ -103,8 +107,9 @@ def feed():
                 }
                 forum_posts_collection.insert_one(new_post)  # Insert new post into MongoDB
 
-        # Fetch all posts sorted by creation time in descending order
-        posts = list(forum_posts_collection.find().sort("createdAt", -1))
+        # Fetch all posts sorted by likes (desc), then by creation time (desc)
+        posts = list(forum_posts_collection.find().sort([("likes", -1), ("createdAt", -1)]))
+        
         return render_template("feed.html", username=user["username"], posts=posts)
 
     return redirect(url_for("login"))
@@ -285,10 +290,11 @@ def profile():
             "email": user.get("email"),
             "role": user.get("role", "regular"),  # Default role as 'regular' if not found
             "profile_created_at": created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None,
+            
             "profile_updated_at": updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None,
-            "followers_count": user.get("followers_count", 0),
+            
             "bio": user.get("bio", "Welcome to my profile!"),
-            "avatar_url": user.get("avatar_url", "https://via.placeholder.com/100"),
+
         }
 
         return render_template("profile.html", user=user_data)
@@ -465,6 +471,52 @@ def save_entry():
     journals_collection.insert_one(new_entry)
     return redirect(url_for("profile"))
 
+@app.route('/update', methods=['POST'])
+def update_mood():
+    data = request.json
+    user_id = data.get("userId")
+    mood_entry = {
+        "date": {"$date": data.get("date")},
+        "mood": data.get("mood")
+    }
+
+    # Update or insert mood data
+    result = analysis_collection.update_one(
+        {"userId": ObjectId(user_id)},
+        {"$push": {"moodData": mood_entry}, "$set": {"updatedAt": datetime.datetime.now()}},
+        upsert=True
+    )
+    return jsonify({"success": True, "matched_count": result.matched_count, "modified_count": result.modified_count})
+
+@app.route('/get_mood_graph/<user_id>', methods=['GET'])
+def get_mood_graph(user_id):
+    # Fetch mood data for the user
+    user_data = analysis_collection.find_one({"userId": ObjectId(user_id)})
+
+    if not user_data or 'moodData' not in user_data:
+        return jsonify({"error": "No mood data found for this user."}), 404
+
+    # Extract dates and moods from the database
+    dates = [entry['date'] for entry in user_data['moodData']]
+    moods = [entry['mood'] for entry in user_data['moodData']]
+
+    # Create the graph
+    plt.figure(figsize=(10, 6))
+    plt.plot(dates, moods, marker='o', color='b', linestyle='-', label="Mood")
+    plt.title(f'Mood Trend for User {user_id}')
+    plt.xlabel('Date')
+    plt.ylabel('Mood')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Show the plot (this will display it in the local environment)
+    plt.show()
+
+    return jsonify({"success": True, "message": "Graph displayed successfully."})
+
+@app.route('/exercise')
+def exercise():
+    return render_template('exercies.html')
 
 @app.route('/mood_tracking')
 def mood_tracking():
@@ -479,6 +531,12 @@ def logout():
     session.pop("user", None)
     flash("You have been logged out.", "info")
     return render_template('mainpage.html')
+
+@app.route("/mood_analysis")
+def mood_analysis():
+    # Logic to render mood analysis page
+    return render_template('mood_analysis.html')
+
 
 @app.route("/resources")
 def resources():
