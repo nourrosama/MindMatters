@@ -103,13 +103,29 @@
       background-color: #218838;
     }
 
-    .btn-info {
-      background-color: #17a2b8;
+    .btn-danger {
+      background-color: #dc3545;
       color: white;
     }
 
-    .btn-info:hover {
-      background-color: #138496;
+    .btn-danger:hover {
+      background-color: #bd2130;
+    }
+
+    .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-group-item div {
+      max-width: 75%;
     }
   </style>
 </head>
@@ -146,18 +162,49 @@
       </div>
     </div>
 
-    <hr>
-
-    <!-- Posts Section -->
-    <!-- Create Post Section -->
-    <div class="mt-5">
-      <h3>Create Post</h3>
-      <form method="POST" action="{{ url_for('feed') }}">
-        <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?" required></textarea>
-        <button type="submit" class="btn btn-success mt-3">Post</button>
-      </form>
-    </div>
-  </div>
+    <body>
+      <div class="container mt-5">
+        <!-- Create Post Section -->
+        <h3>Create Post</h3>
+        <form method="POST" action="{{ url_for('profile') }}">
+          <textarea name="post_content" class="form-control" rows="3" placeholder="What's on your mind?" required></textarea>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="anonymous" id="anonymousCheck">
+            <label class="form-check-label" for="anonymousCheck">
+              Post as Anonymous
+            </label>
+          </div>
+          <button type="submit" class="btn btn-success mt-3">Post</button>
+        </form>
+        
+    
+        <hr>
+    
+        <!-- Booking Section -->
+        <div class="mt-5">
+          <h3>Your Bookings</h3>
+          {% if bookings %}
+          <ul class="list-group">
+            {% for booking in bookings %}
+            <li class="list-group-item">
+              <div>
+                <strong>{{ booking.professionalName }}</strong>
+                <p>{{ booking.professionalSpecialty }}</p>
+                <p><strong>Date & Time:</strong> {{ booking.dateTime }}</p>
+                <p><strong>Status:</strong> {{ booking.status }}</p>
+                <p><strong>Notes:</strong> {{ booking.notes }}</p>
+              </div>
+              <form method="POST" action="{{ url_for('delete_booking', booking_id=booking.id) }}">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>You have no bookings yet.</p>
+          {% endif %}
+        </div>
+      </div>
 
   <!-- Footer -->
   <footer class="footer mt-auto py-3 text-center">

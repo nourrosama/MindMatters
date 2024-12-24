@@ -279,28 +279,72 @@ def profile():
     user_email = session["user"]
     user = users_collection.find_one({"email": user_email})
 
-    if user:
-        # Prepare user data
-        profile_data = user.get("profile", {})
-        created_at = profile_data.get("createdAt")
-        updated_at = profile_data.get("updatedAt")
-
-        user_data = {
-            "username": user.get("username"),
-            "email": user.get("email"),
-            "role": user.get("role", "regular"),  # Default role as 'regular' if not found
-            "profile_created_at": created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None,
-            
-            "profile_updated_at": updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None,
-            
-            "bio": user.get("bio", "Welcome to my profile!"),
-
-        }
-
-        return render_template("profile.html", user=user_data)
-    else:
+    if not user:
         return redirect(url_for('login'))
-    
+
+    # Prepare user data
+    profile_data = user.get("profile", {})
+    created_at = profile_data.get("createdAt")
+    updated_at = profile_data.get("updatedAt")
+
+    user_data = {
+        "username": user.get("username"),
+        "email": user.get("email"),
+        "role": user.get("role", "regular"),  # Default role as 'regular' if not found
+        "profile_created_at": created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None,
+        "profile_updated_at": updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None,
+        "bio": user.get("bio", "Welcome to my profile!"),
+    }
+
+    # Handle POST request for creating a post
+    if request.method == "POST":
+        post_content = request.form.get("post_content", "").strip()
+        is_anonymous = request.form.get("anonymous", "off") == "on"
+
+        if post_content:
+            new_post = {
+                "userId": user["_id"] if not is_anonymous else None,  # Save userId only if not anonymous
+                "username": user.get("username") if not is_anonymous else "Anonymous",  # Use 'Anonymous' as username
+                "content": post_content,
+                "createdAt": datetime.utcnow(),
+                "updatedAt": datetime.utcnow(),
+                "isAnonymous": is_anonymous,
+            }
+            forum_posts_collection.insert_one(new_post)  # Save post to the database
+
+            flash("Post created successfully!", "success")
+        else:
+            flash("Post content cannot be empty.", "danger")
+        
+    # Fetch user's posts
+    user_posts = forum_posts_collection.find({"userId": user["_id"]}) if not user.get("role") == "Anonymous" else forum_posts_collection.find({"isAnonymous": True})
+
+    # Fetch user's bookings
+    user_bookings = bookings_collection.aggregate([
+        {"$match": {"userId": ObjectId(user["_id"])}},
+        {
+            "$lookup": {
+                "from": "Professionals",
+                "localField": "professionalId",
+                "foreignField": "_id",
+                "as": "professionalDetails"
+            }
+        }
+    ])
+
+    bookings_list = []
+    for booking in user_bookings:
+        professional = booking["professionalDetails"][0] if booking["professionalDetails"] else {}
+        bookings_list.append({
+            "id": str(booking["_id"]),
+            "dateTime": booking["dateTime"].strftime("%Y-%m-%d %H:%M"),
+            "status": booking["status"],
+            "notes": booking.get("notes", ""),
+            "professionalName": professional.get("name", "Unknown"),
+            "professionalSpecialty": professional.get("specialty", "N/A"),
+        })
+
+    return render_template("profile.html", user=user_data, bookings=bookings_list, posts=user_posts)
 
 @app.route("/edit_profile", methods=["GET", "POST"])
 def edit_profile():
@@ -450,6 +494,26 @@ def booking(professional_id):
         return redirect(url_for("bookings"))
 
     return render_template("booking.html", doctor=professional)
+
+@app.route("/delete_booking/<string:booking_id>", methods=["POST"])
+def delete_booking(booking_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    # Ensure the booking belongs to the logged-in user
+    user_email = session["user"]
+    user = users_collection.find_one({"email": user_email})
+
+    if user:
+        booking = bookings_collection.find_one({"_id": ObjectId(booking_id)})
+        if booking and booking["userId"] == user["_id"]:
+            bookings_collection.delete_one({"_id": ObjectId(booking_id)})
+            flash("Booking deleted successfully.", "success")
+        else:
+            flash("Booking not found or unauthorized action.", "danger")
+
+    return redirect(url_for("profile"))
+
 # not work aaccording to the database
 
 # @app.route('/save', methods=['POST'])
