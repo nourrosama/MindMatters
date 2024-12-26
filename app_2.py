@@ -9,6 +9,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import matplotlib.pyplot as plt
 import io
 import base64
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Replace with a secure key
@@ -91,8 +95,8 @@ app.secret_key =  secure_key # For session management
 app.config['SERVER_NAME'] = '127.0.0.1:5000'
 oauth = OAuth(app)
 
-GOOGLE_CLIENT_ID = "888313252962-7gqoj5so8vh9vsruosecdrr8sev35b81.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 
 oauth.register(
