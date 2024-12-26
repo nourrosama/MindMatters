@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: MindMatters API
+  description: API documentation for the MindMatters Flask application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+paths:
+  /users:
+    get:
+      summary: Get all users
+      description: Retrieve a list of all users in the database.
+      responses:
+        200:
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    username:
+                      type: string
+                    email:
+                      type: string
+    post:
+      summary: Add a new user
+      description: Add a new user to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: User added successfully.
+  /signup:
+    post:
+      summary: User signup
+      description: Allows a new user to sign up.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                confirm-password:
+                  type: string
+      responses:
+        200:
+          description: Signup successful.
+  /login:
+    post:
+      summary: User login
+      description: Allows an existing user to log in.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful.
+  /feed:
+    get:
+      summary: View feed
+      description: Retrieve all posts for the feed.
+      responses:
+        200:
+          description: Feed data retrieved successfully.
+    post:
+      summary: Add a post to the feed
+      description: Allows a logged-in user to add a post to the feed.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                post_content:
+                  type: string
+      responses:
+        200:
+          description: Post added successfully.
+  /booking/{professional_id}:
+    get:
+      summary: View booking page for a professional
+      description: Retrieve details of a specific professional for booking.
+      parameters:
+        - in: path
+          name: professional_id
+          required: true
+          schema:
+            type: string
+          description: ID of the professional.
+      responses:
+        200:
+          description: Professional details retrieved successfully.
+    post:
+      summary: Create a booking for a professional
+      description: Allows a logged-in user to create a booking with a professional.
+      parameters:
+        - in: path
+          name: professional_id
+          required: true
+          schema:
+            type: string
+          description: ID of the professional.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                dateTime:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        200:
+          description: Booking created successfully.

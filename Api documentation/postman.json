@@ -1,0 +1,152 @@
+{
+    "info": {
+      "name": "Flask API",
+      "description": "Postman collection for Flask API routes",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Get Users",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:5000/users",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["users"]
+          }
+        }
+      },
+      {
+        "name": "Add User",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:5000/users",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["users"]
+          }
+        }
+      },
+      {
+        "name": "Login",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ],
+          "body": {
+            "mode": "urlencoded",
+            "urlencoded": [
+              {"key": "email", "value": "testuser@example.com"},
+              {"key": "password", "value": "password123"}
+            ]
+          },
+          "url": {
+            "raw": "http://localhost:5000/login",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["login"]
+          }
+        }
+      },
+      {
+        "name": "Feed",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:5000/feed",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["feed"]
+          }
+        }
+      },
+      {
+        "name": "Like Post",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:5000/like_post/{{post_id}}",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["like_post", "{{post_id}}"]
+          }
+        }
+      },
+      {
+        "name": "Profile",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:5000/profile",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["profile"]
+          }
+        }
+      },
+      {
+        "name": "Edit Profile",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"bio\": \"New bio content\",\n  \"avatar_url\": \"https://example.com/avatar.png\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:5000/edit_profile",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["edit_profile"]
+          }
+        }
+      },
+      {
+        "name": "Consultation",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:5000/consultation",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["consultation"]
+          }
+        }
+      }
+    ]
+  }
+  
