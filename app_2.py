@@ -62,57 +62,123 @@ secure_key = secrets.token_hex(32)
 app = Flask(__name__)
 app.secret_key =  secure_key # For session management
 
-# Initialize OAuth
+## Initialize OAuth
+#oauth = OAuth(app)
+#
+## Google OAuth configuration
+#google = oauth.register(
+#    name='google',
+#    client_id='your_google_client_id',
+#    client_secret='your_google_client_secret',
+#    access_token_url='https://accounts.google.com/o/oauth2/token',
+#    authorize_url='https://accounts.google.com/o/oauth2/auth',
+#    api_base_url='https://www.googleapis.com/oauth2/v1/',
+#    client_kwargs={'scope': 'openid email profile'}
+#)
+#
+## Facebook OAuth configuration
+#facebook = oauth.register(
+#    name='facebook',
+#    client_id='your_facebook_app_id',
+#    client_secret='your_facebook_app_secret',
+#    access_token_url='https://graph.facebook.com/oauth/access_token',
+#    authorize_url='https://www.facebook.com/dialog/oauth',
+#    api_base_url='https://graph.facebook.com/',
+#    client_kwargs={'scope': 'email'}
+#)
+
+# oauth config
+app.config['SERVER_NAME'] = '127.0.0.1:5000'
 oauth = OAuth(app)
 
-# Google OAuth configuration
-google = oauth.register(
+GOOGLE_CLIENT_ID = "888313252962-7gqoj5so8vh9vsruosecdrr8sev35b81.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+
+oauth.register(
     name='google',
-    client_id='your_google_client_id',
-    client_secret='your_google_client_secret',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'openid email profile'}
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    server_metadata_url=CONF_URL,
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
 )
+google = oauth.create_client('google')
 
-# Facebook OAuth configuration
-facebook = oauth.register(
-    name='facebook',
-    client_id='your_facebook_app_id',
-    client_secret='your_facebook_app_secret',
-    access_token_url='https://graph.facebook.com/oauth/access_token',
-    authorize_url='https://www.facebook.com/dialog/oauth',
-    api_base_url='https://graph.facebook.com/',
-    client_kwargs={'scope': 'email'}
-)
 
+#@app.route("/feed", methods=["GET", "POST"])
+#def feed():
+#    user_email = session.get("user")  # Get the user from the session
+#    if not user_email:
+#        return redirect(url_for("login"))  # Redirect to login if not logged in
+#
+#    user = users_collection.find_one({"email": user_email})  # Fetch user from MongoDB
+#    if user:
+#        if request.method == "POST":
+#            post_content = request.form.get("post_content")
+#            if post_content and post_content.strip():
+#                new_post = {
+#                    "username": user["username"],
+#                    "content": post_content.strip(),
+#                    "likes": 0,
+#                    "createdAt": datetime.utcnow()
+#                }
+#                forum_posts_collection.insert_one(new_post)  # Insert new post into MongoDB
+#
+#        # Fetch all posts sorted by likes (desc), then by creation time (desc)
+#        posts = list(forum_posts_collection.find().sort([("likes", -1), ("createdAt", -1)]))
+#        
+#        return render_template("feed.html", username=user["username"], posts=posts)
+#
+#    return redirect(url_for("login"))
 
 @app.route("/feed", methods=["GET", "POST"])
 def feed():
-    user_email = session.get("user")  # Get the user from the session
-    if not user_email:
-        return redirect(url_for("login"))  # Redirect to login if not logged in
+    # Retrieve user details from session
+    user_info = session.get("user")
 
-    user = users_collection.find_one({"email": user_email})  # Fetch user from MongoDB
-    if user:
-        if request.method == "POST":
-            post_content = request.form.get("post_content")
-            if post_content and post_content.strip():
-                new_post = {
-                    "username": user["username"],
-                    "content": post_content.strip(),
-                    "likes": 0,
-                    "createdAt": datetime.utcnow()
-                }
-                forum_posts_collection.insert_one(new_post)  # Insert new post into MongoDB
+    if not user_info:
+        return redirect(url_for("login"))  # Redirect to manual login if no session
 
-        # Fetch all posts sorted by likes (desc), then by creation time (desc)
-        posts = list(forum_posts_collection.find().sort([("likes", -1), ("createdAt", -1)]))
-        
-        return render_template("feed.html", username=user["username"], posts=posts)
+    # Handle users logging in manually or via Google
+    user_email = user_info.get("email")
+    user = users_collection.find_one({"email": user_email})
 
-    return redirect(url_for("login"))
+    if not user:
+        # Add a new user if they logged in via Google but do not exist in the database
+        if user_info.get("provider") == "Google":
+            new_user = {
+                "email": user_email,
+                "username": user_info.get("name", "Anonymous"),  # Default to "Anonymous" if name is missing
+                "picture": user_info.get("picture"),  # Optional field for user profile picture
+                "provider": "Google",
+                "createdAt": datetime.utcnow()
+            }
+            users_collection.insert_one(new_user)
+            user = new_user  # Use the newly created user
+        else:
+            # Redirect to manual login if user is not in the database
+            return redirect(url_for("login"))
+
+    if request.method == "POST":
+        # Retrieve post content from the form
+        post_content = request.form.get("post_content")
+        if post_content and post_content.strip():
+            # Prepare new post for insertion
+            new_post = {
+                "username": user.get("username"),  # Default to "Anonymous" if no username
+                "content": post_content.strip(),
+                "likes": 0,
+                "createdAt": datetime.utcnow()
+            }
+            forum_posts_collection.insert_one(new_post)  # Insert new post into the collection
+
+    # Fetch all posts, sorted by likes (descending) and creation time (descending)
+    posts = list(forum_posts_collection.find().sort([("likes", -1), ("createdAt", -1)]))
+
+    # Render the feed page with posts and user details
+    return render_template("feed.html", username=user.get("username"), posts=posts)
 
 # Signup Route
 @app.route("/signup", methods=["GET", "POST"])
@@ -182,30 +248,45 @@ def login_google():
 @app.route("/authorize/google")
 def authorize_google():
     token = google.authorize_access_token()
-    user_info = google.get('userinfo').json()
-    
+    user_info_endpoint = google.server_metadata.get("userinfo_endpoint")
+    user_info = google.get(user_info_endpoint).json()
+
+    # Check if the user exists
+    existing_user = users_collection.find_one({"email": user_info['email']})
+
+    if not existing_user:
+        # Add new user to the database
+        new_user = {
+            "username": user_info.get('name'),
+            "email": user_info.get('email'),
+            "picture": user_info.get('picture'),
+            "provider": "Google"
+        }
+        users_collection.insert_one(new_user)
+
+    # Store user info in session
     session['user'] = {
         'provider': 'Google',
-        'name': user_info.get('name'),
+        'username': user_info.get('name'),
         'email': user_info.get('email'),
         'picture': user_info.get('picture')
     }
 
-
-    return redirect(url_for("feed")) 
-
-@app.route("/login/facebook")
-def login_facebook():
-    return facebook.authorize_redirect(url_for("authorize_facebook", _external=True))
-
-@app.route("/authorize/facebook")
-def authorize_facebook():
-    token = facebook.authorize_access_token()
-    user_info = facebook.get('me?fields=id,name,email,picture').json()
+    return redirect(url_for("feed"))
 
 
-
-    return redirect(url_for("feed"))  
+#@app.route("/login/facebook")
+#def login_facebook():
+#    return facebook.authorize_redirect(url_for("authorize_facebook", _external=True))
+#
+#@app.route("/authorize/facebook")
+#def authorize_facebook():
+#    token = facebook.authorize_access_token()
+#    user_info = facebook.get('me?fields=id,name,email,picture').json()
+#
+#
+#
+#    return redirect(url_for("feed"))  
 
 @app.route("/like_post/<string:post_id>", methods=["GET", "POST"])
 def like_post(post_id):
