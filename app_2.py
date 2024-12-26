@@ -11,6 +11,7 @@ import io
 import base64
 from dotenv import load_dotenv
 import os
+from bson import ObjectId
 
 load_dotenv()
 
@@ -46,9 +47,9 @@ analysis_collection = db['Analysis']
 # Test route to get all users
 @app.route("/users", methods=["GET"])
 def get_users():
-    users = list(users_collection.find())
-    for user in users:
-        user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON response
+    users = list(users_collection.find()) #Retrieves all documents from the users_collection,  Converts the result into a Python list of dictionaries, where each dictionary represents a user document.
+    for user in users: #iterates over each user dictionary in the users list
+        user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON response because MongoDB stores unique IDs in a special format called ObjectId
 #    return jsonify(users)
 
 # Route to add a new user
@@ -744,4 +745,4 @@ def trigger_404():
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
