@@ -90,4 +90,4 @@ MindMatters is a Flask-based web application that integrates user authentication
 
 ## Team Members
 
-Nour Osama - Rahma Abd El-Wahab - Salma Khairy - Nehal Muhammed
+Nour Osama - Rahma Abd El-Wahab
